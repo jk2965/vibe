@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot 디버그",
+      "request": "launch",
+      "mainClass": "com.example.registration.RegistrationApplication",
+      "projectName": "registration",
+      "cwd": "${workspaceFolder}/backend",
+      "args": "",
+      "envFile": "${workspaceFolder}/backend/.env"
+    },
+    {
+      "type": "chrome",
+      "name": "Vue Frontend 디버그",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend/src"
+    }
+  ]
+}
