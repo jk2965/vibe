@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibe.mapper.AttendanceRecordMapper">
+
+    <select id="getAttendanceRecordList" parameterType="com.vibe.model.AttendanceRecordSearchParamVO"
+            resultType="com.vibe.model.AttendanceRecordVO">
+        SELECT id, username, check_in_time, check_out_time
+        FROM vibe.attendance_records
+        <where>
+            <if test="username != null and username != ''">
+                AND username = #{username}
+            </if>
+            <if test="fromDate != null and fromDate != ''">
+                AND check_in_time >= #{fromDate}
+            </if>
+        </where>
+        ORDER BY check_in_time DESC
+    </select>
+
+    <insert id="insertAttendanceRecord" parameterType="com.vibe.model.AttendanceRecordVO">
+        INSERT INTO vibe.attendance_records (id, username, check_in_time, check_out_time)
+        VALUES (#{id}, #{username}, #{checkInTime,jdbcType=VARCHAR}, #{checkOutTime,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateAttendanceRecord" parameterType="com.vibe.model.AttendanceRecordVO">
+        UPDATE vibe.attendance_records
+        SET check_out_time = #{checkOutTime}
+        WHERE id = #{id}
+    </update>
+
+</mapper>
