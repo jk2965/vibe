@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibe.mapper.BoardMapper">
+
+    <select id="findAll" resultType="com.vibe.model.BoardVO">
+        SELECT b.id, b.title, b.author_id, b.author_name, b.created_at, b.views,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = b.id) AS comment_count
+        FROM vibe.board b
+        ORDER BY b.created_at DESC
+    </select>
+
+    <select id="findById" parameterType="String" resultType="com.vibe.model.BoardVO">
+        SELECT id, title, content, author_id, author_name, created_at, views
+        FROM vibe.board
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.vibe.model.BoardVO">
+        INSERT INTO vibe.board (id, title, content, author_id, author_name, created_at, views)
+        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=CLOB},
+                #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
+                #{createdAt,jdbcType=VARCHAR}, 0)
+    </insert>
+
+    <update id="update" parameterType="com.vibe.model.BoardVO">
+        UPDATE vibe.board
+        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=CLOB}
+        WHERE id = #{id}
+    </update>
+
+    <update id="incrementViews" parameterType="String">
+        UPDATE vibe.board SET views = views + 1 WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE FROM vibe.board WHERE id = #{id}
+    </delete>
+
+</mapper>

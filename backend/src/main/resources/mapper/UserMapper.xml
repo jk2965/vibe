@@ -3,14 +3,36 @@
 <mapper namespace="com.vibe.mapper.UserMapper">
 
     <select id="findById" parameterType="string" resultType="com.vibe.model.UserVO">
-        SELECT id, username, password
+        SELECT id, username, password, position, remaining_vacation, is_admin
         FROM vibe.users
         WHERE id = #{id}
     </select>
 
+    <select id="findAll" resultType="com.vibe.model.UserVO">
+        SELECT id, username, position, remaining_vacation, is_admin
+        FROM vibe.users
+        ORDER BY username
+    </select>
+
     <insert id="insertUser" parameterType="com.vibe.model.UserVO">
-        INSERT INTO vibe.users (id, username, password)
-        VALUES (#{id}, #{username}, #{password})
+        INSERT INTO vibe.users (id, username, password, position, remaining_vacation, is_admin)
+        VALUES (#{id}, #{username}, #{password},
+                #{position,jdbcType=VARCHAR},
+                #{remainingVacation,jdbcType=NUMERIC},
+                0)
     </insert>
+
+    <update id="updateRemainingVacation" parameterType="com.vibe.model.UserVO">
+        UPDATE vibe.users
+        SET remaining_vacation = #{remainingVacation}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateUserInfo" parameterType="com.vibe.model.UserVO">
+        UPDATE vibe.users
+        SET position = #{position,jdbcType=VARCHAR},
+            remaining_vacation = #{remainingVacation,jdbcType=NUMERIC}
+        WHERE id = #{id}
+    </update>
 
 </mapper>

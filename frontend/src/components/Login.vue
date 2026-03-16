@@ -64,6 +64,7 @@ export default {
       regUserId: '',
       regUsername: '',
       regPassword: '',
+      regPosition: '사원',
       regMsg: '',
       showSuccess: false
     }
@@ -79,7 +80,9 @@ export default {
           localStorage.setItem('loggedIn', 'true')
           localStorage.setItem('userId', this.userId)
           localStorage.setItem('username', res.data.username)
-          this.$router.push('/attendance')
+          localStorage.setItem('position', res.data.position)
+          localStorage.setItem('isAdmin', res.data.isAdmin ? 'true' : 'false')
+          this.$router.push('/home')
         }
       } catch (e) {
         this.errorMsg = e.response?.data?.message || '로그인 실패'
@@ -90,7 +93,8 @@ export default {
         const res = await axios.post('http://localhost:8090/api/auth/register', {
           id: this.regUserId,
           username: this.regUsername,
-          password: this.regPassword
+          password: this.regPassword,
+          position: this.regPosition
         })
         if (res.data.success) {
           this.showRegister = false
@@ -98,6 +102,7 @@ export default {
           this.regUserId = ''
           this.regUsername = ''
           this.regPassword = ''
+          this.regPosition = '사원'
           this.regMsg = ''
         }
       } catch (e) {
@@ -126,7 +131,7 @@ export default {
 h1 { text-align: center; margin-bottom: 30px; font-size: 22px; }
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
-.form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
 .btn-login { width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-bottom: 8px; }
 .btn-login:hover { background: #45a049; }
 .btn-register { width: 100%; padding: 10px; background: white; color: #555; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; cursor: pointer; }

@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -19,11 +21,13 @@ public class UserService {
         return user != null && encoder.matches(password, user.getPassword());
     }
 
-    public void register(String id, String username, String password) {
+    public void register(String id, String username, String password, String position) {
         UserVO user = new UserVO();
         user.setId(id);
         user.setUsername(username);
         user.setPassword(encoder.encode(password));
+        user.setPosition(position != null && !position.isEmpty() ? position : "사원");
+        user.setRemainingVacation(15.0);
         mapper.insertUser(user);
     }
 
@@ -34,5 +38,44 @@ public class UserService {
     public String getUsername(String id) {
         UserVO user = mapper.findById(id);
         return user != null ? user.getUsername() : null;
+    }
+
+    public UserVO getUser(String id) {
+        return mapper.findById(id);
+    }
+
+    public void deductVacation(String id, double days) {
+        UserVO user = mapper.findById(id);
+        if (user != null) {
+            double remaining = user.getRemainingVacation() != null ? user.getRemainingVacation() : 0;
+            user.setRemainingVacation(Math.max(0, remaining - days));
+            mapper.updateRemainingVacation(user);
+        }
+    }
+
+    public void restoreVacation(String id, double days) {
+        UserVO user = mapper.findById(id);
+        if (user != null) {
+            double remaining = user.getRemainingVacation() != null ? user.getRemainingVacation() : 0;
+            user.setRemainingVacation(remaining + days);
+            mapper.updateRemainingVacation(user);
+        }
+    }
+
+    public List<UserVO> getAllUsers() {
+        return mapper.findAll();
+    }
+
+    public void updateUserInfo(String id, String position, Double remainingVacation) {
+        UserVO user = new UserVO();
+        user.setId(id);
+        user.setPosition(position);
+        user.setRemainingVacation(remainingVacation);
+        mapper.updateUserInfo(user);
+    }
+
+    public boolean isAdmin(String id) {
+        UserVO user = mapper.findById(id);
+        return user != null && Integer.valueOf(1).equals(user.getIsAdmin());
     }
 }
