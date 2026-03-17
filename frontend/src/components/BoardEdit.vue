@@ -10,7 +10,8 @@
       </div>
       <div class="form-group">
         <label>내용</label>
-        <textarea v-model="form.content" placeholder="내용을 입력하세요" rows="14"></textarea>
+        <textarea v-model="form.content" placeholder="내용을 입력하세요" rows="14" maxlength="10000"></textarea>
+        <span class="char-count" :class="{ 'near-limit': form.content.length > 9000 }">{{ form.content.length }}/10000</span>
       </div>
       <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
       <div class="btn-row">
@@ -57,6 +58,7 @@ export default {
       this.errorMsg = ''
       if (!this.form.title.trim()) { this.errorMsg = '제목을 입력하세요.'; return }
       if (!this.form.content.trim()) { this.errorMsg = '내용을 입력하세요.'; return }
+      if (this.form.content.length > 10000) { this.errorMsg = '내용은 10000자를 초과할 수 없습니다.'; return }
       try {
         await axios.put(`http://localhost:8090/api/board/${this.postId}`, {
           title: this.form.title.trim(),
@@ -88,6 +90,7 @@ export default {
   box-sizing: border-box; font-size: 14px; resize: vertical; line-height: 1.6;
 }
 .char-count { position: absolute; right: 12px; bottom: 10px; font-size: 12px; color: #aaa; }
+.char-count.near-limit { color: #e53935; font-weight: bold; }
 
 .btn-row { display: flex; gap: 10px; }
 .btn-submit { padding: 11px 36px; background: #1976d2; color: white; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; }

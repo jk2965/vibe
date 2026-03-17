@@ -4,7 +4,7 @@
 
     <select id="findAll" resultType="com.vibe.model.BoardVO">
         SELECT b.id, b.title, b.author_id, b.author_name, b.created_at, b.views,
-               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = b.id) AS comment_count
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = b.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
         FROM vibe.board b
         ORDER BY b.created_at DESC
     </select>
@@ -17,14 +17,14 @@
 
     <insert id="insert" parameterType="com.vibe.model.BoardVO">
         INSERT INTO vibe.board (id, title, content, author_id, author_name, created_at, views)
-        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=CLOB},
+        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
                 #{createdAt,jdbcType=VARCHAR}, 0)
     </insert>
 
     <update id="update" parameterType="com.vibe.model.BoardVO">
         UPDATE vibe.board
-        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=CLOB}
+        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}
         WHERE id = #{id}
     </update>
 

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibe.mapper.NoticeMapper">
+
+    <select id="findAll" resultType="com.vibe.model.NoticeVO">
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.notice n
+        ORDER BY n.created_at DESC
+    </select>
+
+    <select id="findById" parameterType="String" resultType="com.vibe.model.NoticeVO">
+        SELECT id, title, content, author_id, author_name, created_at, views
+        FROM vibe.notice
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.vibe.model.NoticeVO">
+        INSERT INTO vibe.notice (id, title, content, author_id, author_name, created_at, views)
+        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+                #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
+                #{createdAt,jdbcType=VARCHAR}, 0)
+    </insert>
+
+    <update id="update" parameterType="com.vibe.model.NoticeVO">
+        UPDATE vibe.notice
+        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}
+        WHERE id = #{id}
+    </update>
+
+    <update id="incrementViews" parameterType="String">
+        UPDATE vibe.notice SET views = views + 1 WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE FROM vibe.notice WHERE id = #{id}
+    </delete>
+
+</mapper>

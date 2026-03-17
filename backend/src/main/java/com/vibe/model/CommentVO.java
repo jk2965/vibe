@@ -8,6 +8,8 @@ public class CommentVO {
     private String authorName;
     private String content;
     private String createdAt;
+    private String parentId;
+    private Integer isDeleted;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -21,4 +23,8 @@ public class CommentVO {
     public void setContent(String content) { this.content = content; }
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    public String getParentId() { return parentId; }
+    public void setParentId(String parentId) { this.parentId = parentId; }
+    public Integer getIsDeleted() { return isDeleted; }
+    public void setIsDeleted(Integer isDeleted) { this.isDeleted = isDeleted; }
 }

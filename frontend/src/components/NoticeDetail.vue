@@ -1,6 +1,6 @@
 <template>
   <div class="detail-container">
-    <PageHeader title="자유 게시판" />
+    <PageHeader title="전체 공지사항" />
 
     <div v-if="post" class="detail-card">
       <div class="post-header">
@@ -15,18 +15,17 @@
       </div>
       <div class="post-content">{{ post.content }}</div>
       <div class="btn-row">
-        <button @click="$router.push('/board')" class="btn-back">목록으로</button>
+        <button @click="$router.push('/notice')" class="btn-back">목록으로</button>
         <div class="btn-right">
-          <button v-if="canEdit" @click="$router.push(`/board/edit/${post.id}`)" class="btn-edit">수정</button>
+          <button v-if="canEdit" @click="$router.push(`/notice/edit/${post.id}`)" class="btn-edit">수정</button>
           <button v-if="canDelete" @click="deletePost" class="btn-delete">삭제</button>
         </div>
       </div>
     </div>
 
-    <!-- 댓글 영역 -->
     <CommentSection v-if="post" :boardId="$route.params.id" />
 
-    <div v-else class="loading">게시글을 불러오는 중...</div>
+    <div v-else class="loading">공지사항을 불러오는 중...</div>
   </div>
 </template>
 
@@ -36,13 +35,13 @@ import PageHeader from './PageHeader.vue'
 import CommentSection from './CommentSection.vue'
 
 export default {
-  name: 'BoardDetail',
+  name: 'NoticeDetail',
   components: { PageHeader, CommentSection },
   data() {
     return {
       post: null,
       userId: localStorage.getItem('userId') || '',
-      isAdmin: localStorage.getItem('isAdmin') === 'true'
+      adminLevel: parseInt(localStorage.getItem('adminLevel') || '0')
     }
   },
   computed: {
@@ -50,7 +49,7 @@ export default {
       return this.post && this.post.authorId === this.userId
     },
     canDelete() {
-      return this.post && (this.post.authorId === this.userId || this.isAdmin)
+      return this.post && (this.post.authorId === this.userId || this.adminLevel >= 1)
     }
   },
   mounted() {
@@ -59,19 +58,19 @@ export default {
   methods: {
     async fetchPost() {
       try {
-        const res = await axios.get(`http://localhost:8090/api/board/${this.$route.params.id}`)
+        const res = await axios.get(`http://localhost:8090/api/notice/${this.$route.params.id}`)
         this.post = res.data
       } catch (e) {
-        console.error('게시글 조회 실패:', e)
+        console.error('공지사항 조회 실패:', e)
       }
     },
     async deletePost() {
-      if (!confirm('게시글을 삭제하시겠습니까?')) return
+      if (!confirm('공지사항을 삭제하시겠습니까?')) return
       try {
-        await axios.delete(`http://localhost:8090/api/board/${this.post.id}`, {
+        await axios.delete(`http://localhost:8090/api/notice/${this.post.id}`, {
           params: { requesterId: this.userId }
         })
-        this.$router.push('/board')
+        this.$router.push('/notice')
       } catch (e) {
         alert(e.response?.data?.message || '삭제에 실패했습니다.')
       }
@@ -82,15 +81,12 @@ export default {
 
 <style scoped>
 .detail-container { max-width: 900px; margin: 0 auto; padding: 24px; }
-
-/* 게시글 카드 */
 .detail-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; margin-bottom: 16px; }
 .post-header { border-bottom: 2px solid #eee; padding-bottom: 16px; margin-bottom: 24px; }
 .post-title { margin: 0 0 12px 0; font-size: 22px; line-height: 1.4; }
 .post-meta { font-size: 13px; color: #888; }
 .sep { margin: 0 8px; }
 .post-content { min-height: 200px; font-size: 15px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; margin-bottom: 32px; }
-
 .btn-row { display: flex; justify-content: space-between; align-items: center; }
 .btn-right { display: flex; gap: 8px; }
 .btn-back { padding: 10px 24px; background: white; color: #555; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; cursor: pointer; }
@@ -99,6 +95,5 @@ export default {
 .btn-edit:hover { background: #e65100; }
 .btn-delete { padding: 10px 24px; background: #e53935; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
 .btn-delete:hover { background: #c62828; }
-
 .loading { text-align: center; padding: 60px; color: #999; }
 </style>

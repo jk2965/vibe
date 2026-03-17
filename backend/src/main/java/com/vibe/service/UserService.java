@@ -66,16 +66,49 @@ public class UserService {
         return mapper.findAll();
     }
 
-    public void updateUserInfo(String id, String position, Double remainingVacation) {
+    public void updateUserInfo(String id, String position, Double remainingVacation, Integer isAdmin, String team, Integer isTeamLeader) {
         UserVO user = new UserVO();
         user.setId(id);
         user.setPosition(position);
         user.setRemainingVacation(remainingVacation);
+        user.setIsAdmin(isAdmin);
+        user.setTeam(team);
+        user.setIsTeamLeader(isTeamLeader);
         mapper.updateUserInfo(user);
+    }
+
+    public void updateTeam(String id, String team) {
+        UserVO user = new UserVO();
+        user.setId(id);
+        user.setTeam(team);
+        mapper.updateTeam(user);
+    }
+
+    public boolean isTeamLeader(String id) {
+        UserVO user = mapper.findById(id);
+        return user != null && Integer.valueOf(1).equals(user.getIsTeamLeader());
+    }
+
+    public List<UserVO> getUsersByTeam(String team) {
+        return mapper.findByTeam(team);
     }
 
     public boolean isAdmin(String id) {
         UserVO user = mapper.findById(id);
-        return user != null && Integer.valueOf(1).equals(user.getIsAdmin());
+        return user != null && user.getIsAdmin() != null && user.getIsAdmin() >= 1;
+    }
+
+    public boolean isSuperAdmin(String id) {
+        UserVO user = mapper.findById(id);
+        return user != null && Integer.valueOf(2).equals(user.getIsAdmin());
+    }
+
+    public int getAdminLevel(String id) {
+        UserVO user = mapper.findById(id);
+        return user != null && user.getIsAdmin() != null ? user.getIsAdmin() : 0;
+    }
+
+    public boolean hasTeamLeader(String team) {
+        return mapper.countTeamLeaderByTeam(team) > 0;
     }
 }

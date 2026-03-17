@@ -81,7 +81,9 @@ export default {
           localStorage.setItem('userId', this.userId)
           localStorage.setItem('username', res.data.username)
           localStorage.setItem('position', res.data.position)
-          localStorage.setItem('isAdmin', res.data.isAdmin ? 'true' : 'false')
+          localStorage.setItem('adminLevel', res.data.adminLevel ?? 0)
+          localStorage.setItem('team', res.data.team ?? '')
+          localStorage.setItem('isTeamLeader', res.data.isTeamLeader ? 'true' : 'false')
           this.$router.push('/home')
         }
       } catch (e) {

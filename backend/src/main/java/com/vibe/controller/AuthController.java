@@ -26,7 +26,9 @@ public class AuthController {
                 "id", id,
                 "username", user.getUsername(),
                 "position", user.getPosition() != null ? user.getPosition() : "",
-                "isAdmin", user.getIsAdmin() != null && user.getIsAdmin() == 1
+                "adminLevel", user.getIsAdmin() != null ? user.getIsAdmin() : 0,
+                "team", user.getTeam() != null ? user.getTeam() : "",
+                "isTeamLeader", user.getIsTeamLeader() != null && user.getIsTeamLeader() == 1
             ));
         }
         return ResponseEntity.status(401).body(Map.of("success", false, "message", "아이디 또는 비밀번호가 틀렸습니다."));

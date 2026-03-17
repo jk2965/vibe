@@ -3,22 +3,48 @@
 <mapper namespace="com.vibe.mapper.UserMapper">
 
     <select id="findById" parameterType="string" resultType="com.vibe.model.UserVO">
-        SELECT id, username, password, position, remaining_vacation, is_admin
+        SELECT id, username, password, position, remaining_vacation, is_admin, team, is_team_leader
         FROM vibe.users
         WHERE id = #{id}
     </select>
 
     <select id="findAll" resultType="com.vibe.model.UserVO">
-        SELECT id, username, position, remaining_vacation, is_admin
+        SELECT id, username, position, remaining_vacation, is_admin, team, is_team_leader
         FROM vibe.users
-        ORDER BY username
+        ORDER BY
+            CASE WHEN is_admin = 2 THEN 0
+                 WHEN is_admin = 1 THEN 1
+                 WHEN is_team_leader = 1 THEN 2
+                 ELSE 3
+            END,
+            CASE WHEN team IS NULL THEN 0
+                 WHEN team = '1팀' THEN 1
+                 WHEN team = '2팀' THEN 2
+                 ELSE 99
+            END,
+            username
+    </select>
+
+    <select id="findByTeam" parameterType="string" resultType="com.vibe.model.UserVO">
+        SELECT id, username, position, remaining_vacation, is_admin, team, is_team_leader
+        FROM vibe.users
+        WHERE team = #{team}
+        ORDER BY
+            CASE WHEN is_admin = 2 THEN 0
+                 WHEN is_admin = 1 THEN 1
+                 WHEN is_team_leader = 1 THEN 2
+                 ELSE 3
+            END,
+            username
     </select>
 
     <insert id="insertUser" parameterType="com.vibe.model.UserVO">
-        INSERT INTO vibe.users (id, username, password, position, remaining_vacation, is_admin)
+        INSERT INTO vibe.users (id, username, password, position, remaining_vacation, is_admin, team, is_team_leader)
         VALUES (#{id}, #{username}, #{password},
                 #{position,jdbcType=VARCHAR},
                 #{remainingVacation,jdbcType=NUMERIC},
+                0,
+                #{team,jdbcType=VARCHAR},
                 0)
     </insert>
 
@@ -30,8 +56,24 @@
 
     <update id="updateUserInfo" parameterType="com.vibe.model.UserVO">
         UPDATE vibe.users
-        SET position = #{position,jdbcType=VARCHAR},
-            remaining_vacation = #{remainingVacation,jdbcType=NUMERIC}
+        <set>
+            <if test="position != null">position = #{position,jdbcType=VARCHAR},</if>
+            <if test="remainingVacation != null">remaining_vacation = #{remainingVacation,jdbcType=NUMERIC},</if>
+            <if test="isAdmin != null">is_admin = #{isAdmin,jdbcType=NUMERIC},</if>
+            <if test="team != null">team = #{team,jdbcType=VARCHAR},</if>
+            <if test="isTeamLeader != null">is_team_leader = #{isTeamLeader,jdbcType=NUMERIC},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="countTeamLeaderByTeam" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM vibe.users
+        WHERE team = #{team} AND is_team_leader = 1
+    </select>
+
+    <update id="updateTeam" parameterType="com.vibe.model.UserVO">
+        UPDATE vibe.users
+        SET team = #{team,jdbcType=VARCHAR}
         WHERE id = #{id}
     </update>
 

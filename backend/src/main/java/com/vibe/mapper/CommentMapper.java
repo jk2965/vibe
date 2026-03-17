@@ -11,5 +11,5 @@ public interface CommentMapper {
     CommentVO findById(String id);
     void insert(CommentVO comment);
     void update(CommentVO comment);
-    void delete(String id);
+    void softDelete(String id);
 }

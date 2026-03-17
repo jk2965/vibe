@@ -8,6 +8,8 @@ public class UserVO {
     private String position;
     private Double remainingVacation;
     private Integer isAdmin;
+    private String team;
+    private Integer isTeamLeader;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -21,4 +23,8 @@ public class UserVO {
     public void setRemainingVacation(Double remainingVacation) { this.remainingVacation = remainingVacation; }
     public Integer getIsAdmin() { return isAdmin; }
     public void setIsAdmin(Integer isAdmin) { this.isAdmin = isAdmin; }
+    public String getTeam() { return team; }
+    public void setTeam(String team) { this.team = team; }
+    public Integer getIsTeamLeader() { return isTeamLeader; }
+    public void setIsTeamLeader(Integer isTeamLeader) { this.isTeamLeader = isTeamLeader; }
 }

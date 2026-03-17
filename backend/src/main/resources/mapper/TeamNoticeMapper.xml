@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibe.mapper.TeamNoticeMapper">
+
+    <select id="findAll" resultType="com.vibe.model.TeamNoticeVO">
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.team_notice n
+        ORDER BY n.team, n.created_at DESC
+    </select>
+
+    <select id="findByTeam" parameterType="String" resultType="com.vibe.model.TeamNoticeVO">
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.team_notice n
+        WHERE n.team = #{team}
+        ORDER BY n.created_at DESC
+    </select>
+
+    <select id="findById" parameterType="String" resultType="com.vibe.model.TeamNoticeVO">
+        SELECT id, title, content, author_id, author_name, created_at, views, team
+        FROM vibe.team_notice
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.vibe.model.TeamNoticeVO">
+        INSERT INTO vibe.team_notice (id, title, content, author_id, author_name, created_at, views, team)
+        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+                #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
+                #{createdAt,jdbcType=VARCHAR}, 0, #{team,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="update" parameterType="com.vibe.model.TeamNoticeVO">
+        UPDATE vibe.team_notice
+        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}
+        WHERE id = #{id}
+    </update>
+
+    <update id="incrementViews" parameterType="String">
+        UPDATE vibe.team_notice SET views = views + 1 WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE FROM vibe.team_notice WHERE id = #{id}
+    </delete>
+
+</mapper>

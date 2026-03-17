@@ -15,11 +15,11 @@
           <span class="menu-icon">🏖️</span>
           <span class="menu-label">휴가 등록</span>
         </button>
-        <button @click="$router.push('/board')" class="menu-btn board-btn">
+        <button @click="$router.push('/board-hub')" class="menu-btn board-btn">
           <span class="menu-icon">📋</span>
-          <span class="menu-label">자유 게시판</span>
+          <span class="menu-label">게시판</span>
         </button>
-        <button v-if="isAdmin" @click="$router.push('/hr')" class="menu-btn hr-btn">
+        <button v-if="canAccessHr" @click="$router.push('/hr')" class="menu-btn hr-btn">
           <span class="menu-icon">👥</span>
           <span class="menu-label">인사 관리</span>
         </button>
@@ -40,8 +40,17 @@ export default {
     position() {
       return localStorage.getItem('position') || ''
     },
+    adminLevel() {
+      return parseInt(localStorage.getItem('adminLevel') || '0')
+    },
     isAdmin() {
-      return localStorage.getItem('isAdmin') === 'true'
+      return this.adminLevel >= 1
+    },
+    isTeamLeader() {
+      return localStorage.getItem('isTeamLeader') === 'true'
+    },
+    canAccessHr() {
+      return this.isAdmin || this.isTeamLeader
     }
   },
   methods: {
@@ -50,7 +59,9 @@ export default {
       localStorage.removeItem('userId')
       localStorage.removeItem('username')
       localStorage.removeItem('position')
-      localStorage.removeItem('isAdmin')
+      localStorage.removeItem('adminLevel')
+      localStorage.removeItem('team')
+      localStorage.removeItem('isTeamLeader')
       this.$router.push('/login')
     }
   }

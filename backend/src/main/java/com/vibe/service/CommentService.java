@@ -39,6 +39,6 @@ public class CommentService {
     }
 
     public void delete(String id) {
-        mapper.delete(id);
+        mapper.softDelete(id);
     }
 }

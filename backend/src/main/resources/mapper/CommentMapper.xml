@@ -3,22 +3,23 @@
 <mapper namespace="com.vibe.mapper.CommentMapper">
 
     <select id="findByBoardId" parameterType="String" resultType="com.vibe.model.CommentVO">
-        SELECT id, board_id, author_id, author_name, content, created_at
+        SELECT id, board_id, author_id, author_name, content, created_at, parent_id, is_deleted
         FROM vibe.board_comment
         WHERE board_id = #{boardId}
         ORDER BY created_at ASC
     </select>
 
     <select id="findById" parameterType="String" resultType="com.vibe.model.CommentVO">
-        SELECT id, board_id, author_id, author_name, content, created_at
+        SELECT id, board_id, author_id, author_name, content, created_at, parent_id, is_deleted
         FROM vibe.board_comment
         WHERE id = #{id}
     </select>
 
     <insert id="insert" parameterType="com.vibe.model.CommentVO">
-        INSERT INTO vibe.board_comment (id, board_id, author_id, author_name, content, created_at)
+        INSERT INTO vibe.board_comment (id, board_id, author_id, author_name, content, created_at, parent_id)
         VALUES (#{id}, #{boardId,jdbcType=VARCHAR}, #{authorId,jdbcType=VARCHAR},
-                #{authorName,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{createdAt,jdbcType=VARCHAR})
+                #{authorName,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{createdAt,jdbcType=VARCHAR},
+                #{parentId,jdbcType=VARCHAR})
     </insert>
 
     <update id="update" parameterType="com.vibe.model.CommentVO">
@@ -27,8 +28,8 @@
         WHERE id = #{id}
     </update>
 
-    <delete id="delete" parameterType="String">
-        DELETE FROM vibe.board_comment WHERE id = #{id}
-    </delete>
+    <update id="softDelete" parameterType="String">
+        UPDATE vibe.board_comment SET is_deleted = 1 WHERE id = #{id}
+    </update>
 
 </mapper>
