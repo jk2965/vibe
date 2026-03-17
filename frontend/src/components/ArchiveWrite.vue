@@ -1,12 +1,12 @@
 <template>
   <div class="page-container">
-    <PageHeader title="글쓰기" />
+    <PageHeader title="자료실 글쓰기" />
     <PostWriteForm
       :submitting="submitting"
       :errorMsg="errorMsg"
-      submitBtnColor="#1976d2"
+      submitBtnColor="#1565c0"
       @submit="handleSubmit"
-      @cancel="$router.push('/board')"
+      @cancel="$router.push('/archive')"
     />
   </div>
 </template>
@@ -17,7 +17,7 @@ import PageHeader from './PageHeader.vue'
 import PostWriteForm from './PostWriteForm.vue'
 
 export default {
-  name: 'BoardWrite',
+  name: 'ArchiveWrite',
   components: { PageHeader, PostWriteForm },
   data() {
     return { submitting: false, errorMsg: '' }
@@ -28,17 +28,17 @@ export default {
       this.errorMsg = ''
       try {
         const userId = localStorage.getItem('userId')
-        const res = await axios.post('http://localhost:8090/api/board', {
+        const res = await axios.post('http://localhost:8090/api/archive', {
           title, content,
           authorId: userId,
           authorName: localStorage.getItem('username')
-        })
+        }, { params: { requesterId: userId } })
         for (const file of pendingFiles) {
           const fd = new FormData()
           fd.append('file', file)
-          await axios.post(`http://localhost:8090/api/board/${res.data.id}/files`, fd, { params: { requesterId: userId } })
+          await axios.post(`http://localhost:8090/api/archive/${res.data.id}/files`, fd, { params: { requesterId: userId } })
         }
-        this.$router.push(`/board/${res.data.id}`)
+        this.$router.push(`/archive/${res.data.id}`)
       } catch (e) {
         this.errorMsg = e.response?.data?.message || '등록에 실패했습니다.'
       } finally {
@@ -50,5 +50,5 @@ export default {
 </script>
 
 <style scoped>
-.page-container { max-width: 900px; margin: 0 auto; padding: 24px; }
+.page-container { max-width: 960px; margin: 0 auto; padding: 24px; }
 </style>

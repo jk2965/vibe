@@ -18,6 +18,9 @@ public class BoardService {
     @Autowired
     private BoardMapper mapper;
 
+    @Autowired
+    private FileService fileService;
+
     public PageInfo<BoardVO> getList(int pageNum) {
         PageHelper.startPage(pageNum, 10);
         List<BoardVO> list = mapper.findAll();
@@ -26,7 +29,11 @@ public class BoardService {
 
     public BoardVO getDetail(String id) {
         mapper.incrementViews(id);
-        return mapper.findById(id);
+        BoardVO board = mapper.findById(id);
+        if (board != null) {
+            board.setFiles(fileService.getFilesByBoard(id));
+        }
+        return board;
     }
 
     public BoardVO write(BoardVO board) {
@@ -45,6 +52,7 @@ public class BoardService {
     }
 
     public void delete(String id) {
+        fileService.deleteFilesByBoard(id);
         mapper.delete(id);
     }
 }

@@ -20,6 +20,16 @@
           <span class="hub-label">자유 게시판</span>
           <span class="hub-desc">자유롭게 소통하는 공간</span>
         </button>
+        <button @click="$router.push('/archive')" class="hub-btn archive-btn">
+          <span class="hub-icon">🗂️</span>
+          <span class="hub-label">전체 자료실</span>
+          <span class="hub-desc">자료 파일 및 문서 공유</span>
+        </button>
+        <button v-if="canAccessTeamArchive" @click="$router.push('/team-archive')" class="hub-btn team-archive-btn">
+          <span class="hub-icon">📁</span>
+          <span class="hub-label">팀별 자료실</span>
+          <span class="hub-desc">소속 팀 자료 공유</span>
+        </button>
       </div>
     </div>
   </div>
@@ -33,6 +43,11 @@ export default {
   components: { PageHeader },
   computed: {
     canAccessTeamNotice() {
+      const adminLevel = parseInt(localStorage.getItem('adminLevel') || '0')
+      const team = localStorage.getItem('team') || ''
+      return adminLevel >= 2 || !!team
+    },
+    canAccessTeamArchive() {
       const adminLevel = parseInt(localStorage.getItem('adminLevel') || '0')
       const team = localStorage.getItem('team') || ''
       return adminLevel >= 2 || !!team
@@ -86,4 +101,6 @@ export default {
 .notice-btn { background: #00796b; }
 .team-notice-btn { background: #5c6bc0; }
 .board-btn { background: #f57c00; }
+.archive-btn { background: #1565c0; }
+.team-archive-btn { background: #2e7d32; }
 </style>

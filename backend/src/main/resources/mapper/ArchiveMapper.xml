@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibe.mapper.ArchiveMapper">
+
+    <select id="findAll" resultType="com.vibe.model.ArchiveVO">
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
+               (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
+        FROM vibe.archive a
+        ORDER BY a.created_at DESC
+    </select>
+
+    <select id="findById" parameterType="String" resultType="com.vibe.model.ArchiveVO">
+        SELECT id, title, content, author_id, author_name, created_at, views
+        FROM vibe.archive
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.vibe.model.ArchiveVO">
+        INSERT INTO vibe.archive (id, title, content, author_id, author_name, created_at, views)
+        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+                #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
+                #{createdAt,jdbcType=VARCHAR}, 0)
+    </insert>
+
+    <update id="update" parameterType="com.vibe.model.ArchiveVO">
+        UPDATE vibe.archive
+        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}
+        WHERE id = #{id}
+    </update>
+
+    <update id="incrementViews" parameterType="String">
+        UPDATE vibe.archive SET views = views + 1 WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE FROM vibe.archive WHERE id = #{id}
+    </delete>
+
+</mapper>

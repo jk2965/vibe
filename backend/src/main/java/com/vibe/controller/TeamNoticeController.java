@@ -1,14 +1,24 @@
 package com.vibe.controller;
 
+import com.vibe.model.ArchiveFileVO;
 import com.vibe.model.TeamNoticeVO;
 import com.vibe.model.UserVO;
+import com.vibe.service.FileService;
 import com.vibe.service.TeamNoticeService;
 import com.vibe.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/team-notice")
@@ -20,6 +30,12 @@ public class TeamNoticeController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @GetMapping
     public ResponseEntity<?> getList(@RequestParam String team,
@@ -96,5 +112,18 @@ public class TeamNoticeController {
         }
         teamNoticeService.delete(id);
         return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    @PostMapping("/{id}/files")
+    public ResponseEntity<?> uploadFile(@PathVariable String id,
+                                        @RequestParam("file") MultipartFile file,
+                                        @RequestParam(required = false) String requesterId) throws IOException {
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+        String storedName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path path = Paths.get(uploadDir, storedName);
+        Files.write(path, file.getBytes());
+        ArchiveFileVO saved = fileService.saveFile(id, file.getOriginalFilename(), storedName, file.getSize(), requesterId);
+        return ResponseEntity.ok(saved);
     }
 }

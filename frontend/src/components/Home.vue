@@ -2,7 +2,7 @@
   <div class="home-container">
     <div class="home-box">
       <div class="header">
-        <h1>출퇴근 관리 시스템</h1>
+        <h1>관리 시스템</h1>
         <p class="welcome">{{ username }} {{position}}님 환영합니다</p>
       </div>
 

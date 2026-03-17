@@ -34,7 +34,15 @@ const routes = [
   { path: '/team-notice', component: () => import('../components/TeamNotice.vue'), beforeEnter: requireAuth },
   { path: '/team-notice/write', component: () => import('../components/TeamNoticeWrite.vue'), beforeEnter: requireAuth },
   { path: '/team-notice/edit/:id', component: () => import('../components/TeamNoticeEdit.vue'), beforeEnter: requireAuth },
-  { path: '/team-notice/:id', component: () => import('../components/TeamNoticeDetail.vue'), beforeEnter: requireAuth }
+  { path: '/team-notice/:id', component: () => import('../components/TeamNoticeDetail.vue'), beforeEnter: requireAuth },
+  { path: '/archive', component: () => import('../components/Archive.vue'), beforeEnter: requireAuth },
+  { path: '/archive/write', component: () => import('../components/ArchiveWrite.vue'), beforeEnter: requireAuth },
+  { path: '/archive/edit/:id', component: () => import('../components/ArchiveEdit.vue'), beforeEnter: requireAuth },
+  { path: '/archive/:id', component: () => import('../components/ArchiveDetail.vue'), beforeEnter: requireAuth },
+  { path: '/team-archive', component: () => import('../components/TeamArchive.vue'), beforeEnter: requireAuth },
+  { path: '/team-archive/write', component: () => import('../components/TeamArchiveWrite.vue'), beforeEnter: requireAuth },
+  { path: '/team-archive/edit/:id', component: () => import('../components/TeamArchiveEdit.vue'), beforeEnter: requireAuth },
+  { path: '/team-archive/:id', component: () => import('../components/TeamArchiveDetail.vue'), beforeEnter: requireAuth }
 ]
 
 export default createRouter({

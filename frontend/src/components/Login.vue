@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h1>출퇴근 관리 시스템</h1>
+      <h1>관리 시스템</h1>
 
       <div class="form-group">
         <label>아이디</label>

@@ -18,6 +18,9 @@ public class NoticeService {
     @Autowired
     private NoticeMapper mapper;
 
+    @Autowired
+    private FileService fileService;
+
     public PageInfo<NoticeVO> getList(int pageNum) {
         PageHelper.startPage(pageNum, 10);
         List<NoticeVO> list = mapper.findAll();
@@ -26,7 +29,11 @@ public class NoticeService {
 
     public NoticeVO getDetail(String id) {
         mapper.incrementViews(id);
-        return mapper.findById(id);
+        NoticeVO notice = mapper.findById(id);
+        if (notice != null) {
+            notice.setFiles(fileService.getFilesByBoard(id));
+        }
+        return notice;
     }
 
     public NoticeVO write(NoticeVO notice) {
@@ -45,6 +52,7 @@ public class NoticeService {
     }
 
     public void delete(String id) {
+        fileService.deleteFilesByBoard(id);
         mapper.delete(id);
     }
 }

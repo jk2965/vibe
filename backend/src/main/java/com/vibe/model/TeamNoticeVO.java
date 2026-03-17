@@ -1,5 +1,7 @@
 package com.vibe.model;
 
+import java.util.List;
+
 public class TeamNoticeVO {
 
     private String id;
@@ -11,6 +13,7 @@ public class TeamNoticeVO {
     private Integer views;
     private Integer commentCount;
     private String team;
+    private List<ArchiveFileVO> files;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -30,4 +33,6 @@ public class TeamNoticeVO {
     public void setCommentCount(Integer commentCount) { this.commentCount = commentCount; }
     public String getTeam() { return team; }
     public void setTeam(String team) { this.team = team; }
+    public List<ArchiveFileVO> getFiles() { return files; }
+    public void setFiles(List<ArchiveFileVO> files) { this.files = files; }
 }

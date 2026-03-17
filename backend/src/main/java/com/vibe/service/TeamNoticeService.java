@@ -18,6 +18,9 @@ public class TeamNoticeService {
     @Autowired
     private TeamNoticeMapper mapper;
 
+    @Autowired
+    private FileService fileService;
+
     public PageInfo<TeamNoticeVO> getListByTeam(String team, int pageNum) {
         PageHelper.startPage(pageNum, 10);
         List<TeamNoticeVO> list = mapper.findByTeam(team);
@@ -26,7 +29,11 @@ public class TeamNoticeService {
 
     public TeamNoticeVO getDetail(String id) {
         mapper.incrementViews(id);
-        return mapper.findById(id);
+        TeamNoticeVO notice = mapper.findById(id);
+        if (notice != null) {
+            notice.setFiles(fileService.getFilesByBoard(id));
+        }
+        return notice;
     }
 
     public TeamNoticeVO write(TeamNoticeVO notice) {
@@ -45,6 +52,7 @@ public class TeamNoticeService {
     }
 
     public void delete(String id) {
+        fileService.deleteFilesByBoard(id);
         mapper.delete(id);
     }
 }

@@ -5,6 +5,17 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
   server: {
-    port: 8080
+    port: 8080,
+    proxy: {
+      '/api': 'http://localhost:8090'
+    }
+  },
+  optimizeDeps: {
+    include: [
+      '@tiptap/vue-3',
+      '@tiptap/starter-kit',
+      '@tiptap/extension-image',
+      '@tiptap/extension-underline'
+    ]
   }
 })

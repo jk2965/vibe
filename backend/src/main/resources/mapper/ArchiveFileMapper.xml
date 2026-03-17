@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibe.mapper.ArchiveFileMapper">
+
+    <insert id="insert" parameterType="com.vibe.model.ArchiveFileVO">
+        INSERT INTO vibe.archive_file (id, board_id, original_name, stored_name, file_size, created_at, uploader_id)
+        VALUES (#{id}, #{boardId}, #{originalName,jdbcType=VARCHAR}, #{storedName,jdbcType=VARCHAR},
+                #{fileSize,jdbcType=NUMERIC}, #{createdAt,jdbcType=VARCHAR}, #{uploaderId,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="findByBoardId" parameterType="String" resultType="com.vibe.model.ArchiveFileVO">
+        SELECT id, board_id, original_name, stored_name, file_size, created_at, uploader_id
+        FROM vibe.archive_file
+        WHERE board_id = #{boardId}
+        ORDER BY created_at ASC
+    </select>
+
+    <select id="findById" parameterType="String" resultType="com.vibe.model.ArchiveFileVO">
+        SELECT id, board_id, original_name, stored_name, file_size, created_at, uploader_id
+        FROM vibe.archive_file
+        WHERE id = #{id}
+    </select>
+
+    <delete id="deleteByBoardId" parameterType="String">
+        DELETE FROM vibe.archive_file WHERE board_id = #{boardId}
+    </delete>
+
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM vibe.archive_file WHERE id = #{id}
+    </delete>
+
+</mapper>

@@ -1,13 +1,13 @@
 <template>
   <div class="page-container">
-    <PageHeader :title="post ? post.team + ' 공지사항' : '팀별 공지사항'" />
+    <PageHeader :title="post ? post.team + ' 자료실' : '팀별 자료실'" />
     <PostDetailCard
       v-if="post"
       :post="post"
       :canEdit="canEdit"
       :canDelete="canDelete"
-      :editRoute="`/team-notice/edit/${post.id}`"
-      backRoute="/team-notice"
+      :editRoute="`/team-archive/edit/${post.id}`"
+      backRoute="/team-archive"
       @delete="deletePost"
       @file-deleted="id => post.files = post.files.filter(f => f.id !== id)"
     >
@@ -17,7 +17,7 @@
       </template>
     </PostDetailCard>
     <CommentSection v-if="post" :boardId="$route.params.id" />
-    <div v-if="!post" class="loading">공지사항을 불러오는 중...</div>
+    <div v-if="!post" class="loading">자료를 불러오는 중...</div>
   </div>
 </template>
 
@@ -28,7 +28,7 @@ import CommentSection from './CommentSection.vue'
 import PostDetailCard from './PostDetailCard.vue'
 
 export default {
-  name: 'TeamNoticeDetail',
+  name: 'TeamArchiveDetail',
   components: { PageHeader, CommentSection, PostDetailCard },
   data() {
     return {
@@ -47,22 +47,22 @@ export default {
   methods: {
     async fetchPost() {
       try {
-        const res = await axios.get(`http://localhost:8090/api/team-notice/${this.$route.params.id}`, {
+        const res = await axios.get(`http://localhost:8090/api/team-archive/${this.$route.params.id}`, {
           params: { requesterId: this.userId }
         })
         this.post = res.data
       } catch (e) {
         if (e.response?.status === 403) {
           alert('접근 권한이 없습니다.')
-          this.$router.push('/team-notice')
+          this.$router.push('/team-archive')
         }
       }
     },
     async deletePost() {
-      if (!confirm('공지사항을 삭제하시겠습니까?')) return
+      if (!confirm('이 자료를 삭제하시겠습니까?')) return
       try {
-        await axios.delete(`http://localhost:8090/api/team-notice/${this.post.id}`, { params: { requesterId: this.userId } })
-        this.$router.push('/team-notice')
+        await axios.delete(`http://localhost:8090/api/team-archive/${this.post.id}`, { params: { requesterId: this.userId } })
+        this.$router.push('/team-archive')
       } catch (e) {
         alert(e.response?.data?.message || '삭제에 실패했습니다.')
       }
@@ -72,8 +72,8 @@ export default {
 </script>
 
 <style scoped>
-.page-container { max-width: 900px; margin: 0 auto; padding: 24px; }
-.team-badge { background: #e8eaf6; color: #3949ab; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+.page-container { max-width: 960px; margin: 0 auto; padding: 24px; }
+.team-badge { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
 .sep { margin: 0 6px; }
 .loading { text-align: center; padding: 60px; color: #999; }
 </style>

@@ -1,60 +1,53 @@
 <template>
-  <div class="write-container">
+  <div class="page-container">
     <PageHeader :title="team + ' 공지사항 작성'" />
-
-    <div class="write-card">
-      <div class="form-group">
-        <label>제목</label>
-        <input v-model="form.title" type="text" placeholder="제목을 입력하세요" maxlength="200">
-        <span class="char-count">{{ form.title.length }}/200</span>
-      </div>
-      <div class="form-group">
-        <label>내용</label>
-        <textarea v-model="form.content" placeholder="내용을 입력하세요" rows="14" maxlength="10000"></textarea>
-        <span class="char-count" :class="{ 'near-limit': form.content.length > 9000 }">{{ form.content.length }}/10000</span>
-      </div>
-      <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
-      <div class="btn-row">
-        <button @click="submit" class="btn-submit">등록</button>
-        <button @click="$router.push('/team-notice')" class="btn-cancel">취소</button>
-      </div>
-    </div>
+    <PostWriteForm
+      :submitting="submitting"
+      :errorMsg="errorMsg"
+      submitBtnColor="#5c6bc0"
+      @submit="handleSubmit"
+      @cancel="$router.push('/team-notice')"
+    />
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 import PageHeader from './PageHeader.vue'
+import PostWriteForm from './PostWriteForm.vue'
 
 export default {
   name: 'TeamNoticeWrite',
-  components: { PageHeader },
+  components: { PageHeader, PostWriteForm },
   data() {
     return {
       team: this.$route.query.team || localStorage.getItem('team') || '',
-      form: { title: '', content: '' },
+      submitting: false,
       errorMsg: ''
     }
   },
   methods: {
-    async submit() {
+    async handleSubmit({ title, content, pendingFiles }) {
+      this.submitting = true
       this.errorMsg = ''
-      if (!this.form.title.trim()) { this.errorMsg = '제목을 입력하세요.'; return }
-      if (!this.form.content.trim()) { this.errorMsg = '내용을 입력하세요.'; return }
-      if (this.form.content.length > 10000) { this.errorMsg = '내용은 10000자를 초과할 수 없습니다.'; return }
       try {
+        const userId = localStorage.getItem('userId')
         const res = await axios.post('http://localhost:8090/api/team-notice', {
-          title: this.form.title.trim(),
-          content: this.form.content.trim(),
-          authorId: localStorage.getItem('userId'),
+          title, content,
+          authorId: userId,
           authorName: localStorage.getItem('username'),
           team: this.team
-        }, {
-          params: { requesterId: localStorage.getItem('userId') }
-        })
+        }, { params: { requesterId: userId } })
+        for (const file of pendingFiles) {
+          const fd = new FormData()
+          fd.append('file', file)
+          await axios.post(`http://localhost:8090/api/team-notice/${res.data.id}/files`, fd, { params: { requesterId: userId } })
+        }
         this.$router.push(`/team-notice/${res.data.id}`)
       } catch (e) {
         this.errorMsg = e.response?.data?.message || '등록에 실패했습니다.'
+      } finally {
+        this.submitting = false
       }
     }
   }
@@ -62,18 +55,5 @@ export default {
 </script>
 
 <style scoped>
-.write-container { max-width: 900px; margin: 0 auto; padding: 24px; }
-.write-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 28px; }
-.form-group { margin-bottom: 20px; position: relative; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
-.form-group input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
-.form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; resize: vertical; line-height: 1.6; }
-.char-count { position: absolute; right: 12px; bottom: 10px; font-size: 12px; color: #aaa; }
-.char-count.near-limit { color: #e53935; font-weight: bold; }
-.btn-row { display: flex; gap: 10px; }
-.btn-submit { padding: 11px 36px; background: #5c6bc0; color: white; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; }
-.btn-submit:hover { background: #3949ab; }
-.btn-cancel { padding: 11px 24px; background: white; color: #555; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; cursor: pointer; }
-.btn-cancel:hover { background: #f5f5f5; }
-.error-msg { color: red; font-size: 13px; margin-bottom: 12px; }
+.page-container { max-width: 900px; margin: 0 auto; padding: 24px; }
 </style>

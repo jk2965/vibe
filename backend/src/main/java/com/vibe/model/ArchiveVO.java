@@ -2,8 +2,7 @@ package com.vibe.model;
 
 import java.util.List;
 
-public class BoardVO {
-
+public class ArchiveVO {
     private String id;
     private String title;
     private String content;
