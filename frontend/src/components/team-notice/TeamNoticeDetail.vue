@@ -23,9 +23,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
-import CommentSection from './CommentSection.vue'
-import PostDetailCard from './PostDetailCard.vue'
+import PageHeader from '../common/PageHeader.vue'
+import CommentSection from '../common/CommentSection.vue'
+import PostDetailCard from '../common/PostDetailCard.vue'
 
 export default {
   name: 'TeamNoticeDetail',

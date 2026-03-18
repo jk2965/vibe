@@ -1,29 +1,29 @@
 <template>
   <div class="page-container">
-    <PageHeader title="전체 자료실" />
+    <PageHeader title="전체 공지사항" />
     <PostDetailCard
       v-if="post"
       :post="post"
       :canEdit="canEdit"
       :canDelete="canDelete"
-      :editRoute="`/archive/edit/${post.id}`"
-      backRoute="/archive"
+      :editRoute="`/notice/edit/${post.id}`"
+      backRoute="/notice"
       @delete="deletePost"
       @file-deleted="id => post.files = post.files.filter(f => f.id !== id)"
     />
     <CommentSection v-if="post" :boardId="$route.params.id" />
-    <div v-if="!post" class="loading">자료를 불러오는 중...</div>
+    <div v-if="!post" class="loading">공지사항을 불러오는 중...</div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
-import CommentSection from './CommentSection.vue'
-import PostDetailCard from './PostDetailCard.vue'
+import PageHeader from '../common/PageHeader.vue'
+import CommentSection from '../common/CommentSection.vue'
+import PostDetailCard from '../common/PostDetailCard.vue'
 
 export default {
-  name: 'ArchiveDetail',
+  name: 'NoticeDetail',
   components: { PageHeader, CommentSection, PostDetailCard },
   data() {
     return {
@@ -42,17 +42,17 @@ export default {
   methods: {
     async fetchPost() {
       try {
-        const res = await axios.get(`http://localhost:8090/api/archive/${this.$route.params.id}`)
+        const res = await axios.get(`http://localhost:8090/api/notice/${this.$route.params.id}`)
         this.post = res.data
       } catch (e) {
-        console.error('자료 조회 실패:', e)
+        console.error('공지사항 조회 실패:', e)
       }
     },
     async deletePost() {
-      if (!confirm('이 자료를 삭제하시겠습니까?')) return
+      if (!confirm('공지사항을 삭제하시겠습니까?')) return
       try {
-        await axios.delete(`http://localhost:8090/api/archive/${this.post.id}`, { params: { requesterId: this.userId } })
-        this.$router.push('/archive')
+        await axios.delete(`http://localhost:8090/api/notice/${this.post.id}`, { params: { requesterId: this.userId } })
+        this.$router.push('/notice')
       } catch (e) {
         alert(e.response?.data?.message || '삭제에 실패했습니다.')
       }
@@ -62,6 +62,6 @@ export default {
 </script>
 
 <style scoped>
-.page-container { max-width: 960px; margin: 0 auto; padding: 24px; }
+.page-container { max-width: 900px; margin: 0 auto; padding: 24px; }
 .loading { text-align: center; padding: 60px; color: #999; }
 </style>

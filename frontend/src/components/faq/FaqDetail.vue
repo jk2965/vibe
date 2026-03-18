@@ -61,8 +61,8 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
-import TiptapEditor from './TiptapEditor.vue'
+import PageHeader from '../common/PageHeader.vue'
+import TiptapEditor from '../common/TiptapEditor.vue'
 
 export default {
   name: 'FaqDetail',

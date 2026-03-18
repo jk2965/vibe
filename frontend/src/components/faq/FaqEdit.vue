@@ -19,8 +19,8 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
-import PostEditForm from './PostEditForm.vue'
+import PageHeader from '../common/PageHeader.vue'
+import PostEditForm from '../common/PostEditForm.vue'
 
 export default {
   name: 'FaqEdit',

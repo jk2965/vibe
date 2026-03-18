@@ -1,26 +1,26 @@
 <template>
   <div class="page-container">
-    <PageHeader title="자료실 수정" />
+    <PageHeader title="팀 공지사항 수정" />
     <PostEditForm
       :initialTitle="form.title"
       :initialContent="form.content"
       :existingFiles="existingFiles"
       :submitting="submitting"
       :errorMsg="errorMsg"
-      submitBtnColor="#1565c0"
+      submitBtnColor="#5c6bc0"
       @submit="handleSubmit"
-      @cancel="$router.push(`/archive/${postId}`)"
+      @cancel="$router.push(`/team-notice/${postId}`)"
     />
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
-import PostEditForm from './PostEditForm.vue'
+import PageHeader from '../common/PageHeader.vue'
+import PostEditForm from '../common/PostEditForm.vue'
 
 export default {
-  name: 'ArchiveEdit',
+  name: 'TeamNoticeEdit',
   components: { PageHeader, PostEditForm },
   data() {
     return {
@@ -37,12 +37,18 @@ export default {
   methods: {
     async loadPost() {
       try {
-        const res = await axios.get(`http://localhost:8090/api/archive/${this.postId}`)
+        const res = await axios.get(`http://localhost:8090/api/team-notice/${this.postId}`, {
+          params: { requesterId: localStorage.getItem('userId') }
+        })
+        if (res.data.authorId !== localStorage.getItem('userId')) {
+          this.$router.push(`/team-notice/${this.postId}`)
+          return
+        }
         this.form.title = res.data.title
         this.form.content = res.data.content || ''
         this.existingFiles = res.data.files || []
       } catch (e) {
-        this.$router.push('/archive')
+        this.$router.push('/team-notice')
       }
     },
     async handleSubmit({ title, content, pendingFiles }) {
@@ -50,13 +56,13 @@ export default {
       this.errorMsg = ''
       try {
         const userId = localStorage.getItem('userId')
-        await axios.put(`http://localhost:8090/api/archive/${this.postId}`, { title, content }, { params: { requesterId: userId } })
+        await axios.put(`http://localhost:8090/api/team-notice/${this.postId}`, { title, content }, { params: { requesterId: userId } })
         for (const file of pendingFiles) {
           const fd = new FormData()
           fd.append('file', file)
-          await axios.post(`http://localhost:8090/api/archive/${this.postId}/files`, fd, { params: { requesterId: userId } })
+          await axios.post(`http://localhost:8090/api/team-notice/${this.postId}/files`, fd, { params: { requesterId: userId } })
         }
-        this.$router.push(`/archive/${this.postId}`)
+        this.$router.push(`/team-notice/${this.postId}`)
       } catch (e) {
         this.errorMsg = e.response?.data?.message || '수정에 실패했습니다.'
       } finally {
@@ -68,5 +74,5 @@ export default {
 </script>
 
 <style scoped>
-.page-container { max-width: 960px; margin: 0 auto; padding: 24px; }
+.page-container { max-width: 900px; margin: 0 auto; padding: 24px; }
 </style>

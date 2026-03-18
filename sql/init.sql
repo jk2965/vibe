@@ -68,3 +68,18 @@ CREATE TABLE vibe.faq (
     created_at   VARCHAR2(30),
     views        NUMBER(10)       DEFAULT 0
 );
+
+-- 일정 테이블
+CREATE TABLE vibe.schedule (
+    id          VARCHAR2(100)   NOT NULL PRIMARY KEY,
+    title       VARCHAR2(200)   NOT NULL,
+    start_date  VARCHAR2(30)    NOT NULL,
+    end_date    VARCHAR2(30),
+    color       VARCHAR2(30),
+    user_id     VARCHAR2(100)   NOT NULL,
+    description VARCHAR2(1000),
+    created_at  VARCHAR2(30)
+);
+
+-- schedule 테이블 team 컬럼 추가 (기존 테이블 있는 경우)
+-- ALTER TABLE vibe.schedule ADD (team VARCHAR2(100));

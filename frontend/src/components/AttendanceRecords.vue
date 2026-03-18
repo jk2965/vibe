@@ -39,7 +39,7 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
+import PageHeader from './common/PageHeader.vue'
 
 export default {
   name: 'AttendanceRecords',

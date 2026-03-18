@@ -55,7 +55,7 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
+import PageHeader from '../common/PageHeader.vue'
 import hljs from 'highlight.js'
 
 export default {

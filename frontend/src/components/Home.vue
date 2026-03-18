@@ -15,6 +15,10 @@
           <span class="menu-icon">🏖️</span>
           <span class="menu-label">휴가 등록</span>
         </button>
+        <button @click="$router.push('/calendar')" class="menu-btn calendar-btn">
+          <span class="menu-icon">📅</span>
+          <span class="menu-label">일정 관리</span>
+        </button>
         <button @click="$router.push('/board-hub')" class="menu-btn board-btn">
           <span class="menu-icon">📋</span>
           <span class="menu-label">게시판</span>
@@ -114,6 +118,7 @@ export default {
 .menu-btn:hover { opacity: 0.88; }
 .attendance-btn { background: #4CAF50; color: white; }
 .vacation-btn { background: #2196F3; color: white; }
+.calendar-btn { background: #00897b; color: white; }
 .board-btn { background: #f57c00; color: white; }
 .hr-btn { background: #7b1fa2; color: white; }
 .menu-icon { font-size: 24px; }

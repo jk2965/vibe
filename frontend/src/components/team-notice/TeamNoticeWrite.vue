@@ -13,8 +13,8 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
-import PostWriteForm from './PostWriteForm.vue'
+import PageHeader from '../common/PageHeader.vue'
+import PostWriteForm from '../common/PostWriteForm.vue'
 
 export default {
   name: 'TeamNoticeWrite',

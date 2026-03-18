@@ -1,11 +1,11 @@
 <template>
   <div class="board-container">
-    <PageHeader title="전체 공지사항" />
+    <PageHeader title="전체 자료실" />
 
     <div class="list-card">
       <div class="card-header">
-        <h2>공지사항 목록</h2>
-        <button v-if="canWrite" @click="$router.push('/notice/write')" class="btn-write">글쓰기</button>
+        <h2>자료실 목록</h2>
+        <button v-if="canWrite" @click="$router.push('/archive/write')" class="btn-write">글쓰기</button>
       </div>
 
       <table class="board-table">
@@ -15,21 +15,24 @@
             <th class="col-title">제목</th>
             <th class="col-author">작성자</th>
             <th class="col-date">작성일</th>
+            <th class="col-file">파일</th>
             <th class="col-views">조회</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="posts.length === 0">
-            <td colspan="5" class="empty">등록된 공지사항이 없습니다.</td>
+            <td colspan="6" class="empty">등록된 자료가 없습니다.</td>
           </tr>
           <tr v-for="(post, index) in posts" :key="post.id" @click="goDetail(post.id)" class="post-row">
             <td class="col-no">{{ totalCount - (pageNum - 1) * 10 - index }}</td>
             <td class="col-title title-cell">
               {{ post.title }}
               <span v-if="post.commentCount > 0" class="comment-count">[{{ post.commentCount }}]</span>
+              <span v-if="post.fileCount > 0" class="file-badge">📎{{ post.fileCount }}</span>
             </td>
             <td class="col-author">{{ post.authorName }}</td>
             <td class="col-date">{{ formatDate(post.createdAt) }}</td>
+            <td class="col-file">{{ post.fileCount || 0 }}</td>
             <td class="col-views">{{ post.views }}</td>
           </tr>
         </tbody>
@@ -51,10 +54,10 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from './PageHeader.vue'
+import PageHeader from '../common/PageHeader.vue'
 
 export default {
-  name: 'Notice',
+  name: 'Archive',
   components: { PageHeader },
   data() {
     const adminLevel = parseInt(localStorage.getItem('adminLevel') || '0')
@@ -82,14 +85,14 @@ export default {
   methods: {
     async fetchPosts() {
       try {
-        const res = await axios.get('http://localhost:8090/api/notice', {
+        const res = await axios.get('http://localhost:8090/api/archive', {
           params: { pageNum: this.pageNum }
         })
         this.posts = res.data.list
         this.totalPages = res.data.pages
         this.totalCount = res.data.total
       } catch (e) {
-        console.error('공지사항 목록 조회 실패:', e)
+        console.error('자료실 목록 조회 실패:', e)
       }
     },
     changePage(p) {
@@ -98,7 +101,7 @@ export default {
       this.fetchPosts()
     },
     goDetail(id) {
-      this.$router.push(`/notice/${id}`)
+      this.$router.push(`/archive/${id}`)
     },
     formatDate(dateStr) {
       if (!dateStr) return '-'
@@ -109,23 +112,25 @@ export default {
 </script>
 
 <style scoped>
-.board-container { max-width: 900px; margin: 0 auto; padding: 24px; }
+.board-container { max-width: 960px; margin: 0 auto; padding: 24px; }
 .list-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 24px; }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .card-header h2 { margin: 0; font-size: 18px; }
-.btn-write { padding: 8px 20px; background: #00796b; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
-.btn-write:hover { background: #00695c; }
+.btn-write { padding: 8px 20px; background: #1565c0; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+.btn-write:hover { background: #0d47a1; }
 .board-table { width: 100%; border-collapse: collapse; }
 .board-table th, .board-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
 .board-table th { background: #f5f5f5; font-weight: bold; }
 .col-no { width: 60px; text-align: center; }
 .col-author { width: 110px; }
 .col-date { width: 100px; }
+.col-file { width: 50px; text-align: center; }
 .col-views { width: 60px; text-align: center; }
 .post-row { cursor: pointer; }
 .post-row:hover { background: #f9f9f9; }
 .title-cell { color: #1a1a1a; font-weight: 500; }
-.comment-count { color: #00796b; font-size: 13px; margin-left: 4px; }
+.comment-count { color: #1565c0; font-size: 13px; margin-left: 4px; }
+.file-badge { font-size: 12px; color: #888; margin-left: 6px; }
 .empty { text-align: center; color: #999; padding: 40px; }
 .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 24px; }
 .page-btn { padding: 6px 14px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; }
@@ -133,5 +138,5 @@ export default {
 .page-btn:not(:disabled):hover { background: #f0f0f0; }
 .page-num { width: 34px; height: 34px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; }
 .page-num:hover { background: #f0f0f0; }
-.page-num.active { background: #00796b; color: white; border-color: #00796b; font-weight: bold; }
+.page-num.active { background: #1565c0; color: white; border-color: #1565c0; font-weight: bold; }
 </style>

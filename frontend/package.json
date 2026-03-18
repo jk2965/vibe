@@ -9,6 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/list": "^6.1.20",
+    "@fullcalendar/vue3": "^6.1.20",
     "@tiptap/extension-code-block-lowlight": "^2.27.2",
     "@tiptap/extension-image": "^2.1.0",
     "@tiptap/extension-link": "^2.27.2",
