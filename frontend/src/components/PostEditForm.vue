@@ -1,19 +1,19 @@
 <template>
   <div class="write-card">
     <div class="form-group">
-      <label>제목</label>
-      <input v-model="localTitle" type="text" placeholder="제목을 입력하세요" maxlength="200">
+      <label>{{ titleLabel }}</label>
+      <input v-model="localTitle" type="text" :placeholder="`${titleLabel}을 입력하세요`" maxlength="500">
     </div>
     <div class="form-group">
-      <label>내용</label>
+      <label>{{ contentLabel }}</label>
       <TiptapEditor v-model="localContent" :imageUploadUrl="imageUploadUrl" />
     </div>
     <slot name="extra-fields"></slot>
-    <div class="form-group" v-if="localExistingFiles.length > 0">
+    <div v-if="showFiles && localExistingFiles.length > 0" class="form-group">
       <label>기존 첨부파일</label>
       <FileList :files="localExistingFiles" :canDelete="true" @file-deleted="handleFileDeleted" />
     </div>
-    <div class="form-group">
+    <div v-if="showFiles" class="form-group">
       <label>파일 추가</label>
       <FileUploadInput v-model="localFiles" />
     </div>
@@ -42,7 +42,10 @@ export default {
     submitting: { type: Boolean, default: false },
     errorMsg: { type: String, default: '' },
     imageUploadUrl: { type: String, default: '/api/archive/image' },
-    submitBtnColor: { type: String, default: '#1976d2' }
+    submitBtnColor: { type: String, default: '#1976d2' },
+    showFiles: { type: Boolean, default: true },
+    titleLabel: { type: String, default: '제목' },
+    contentLabel: { type: String, default: '내용' }
   },
   emits: ['submit', 'cancel'],
   data() {
@@ -67,8 +70,8 @@ export default {
   methods: {
     handleSubmit() {
       this.localError = ''
-      if (!this.localTitle.trim()) { this.localError = '제목을 입력하세요.'; return }
-      if (!this.localContent || this.localContent === '<p></p>') { this.localError = '내용을 입력하세요.'; return }
+      if (!this.localTitle.trim()) { this.localError = `${this.titleLabel}을 입력하세요.`; return }
+      if (!this.localContent || this.localContent === '<p></p>') { this.localError = `${this.contentLabel}을 입력하세요.`; return }
       this.$emit('submit', {
         title: this.localTitle.trim(),
         content: this.localContent,

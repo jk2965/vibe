@@ -9,12 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tiptap/extension-code-block-lowlight": "^2.27.2",
     "@tiptap/extension-image": "^2.1.0",
+    "@tiptap/extension-link": "^2.27.2",
     "@tiptap/extension-underline": "^2.1.0",
     "@tiptap/pm": "^2.1.0",
     "@tiptap/starter-kit": "^2.1.0",
     "@tiptap/vue-3": "^2.1.0",
     "axios": "^1.4.0",
+    "lowlight": "^2.9.0",
     "quill": "^2.0.3",
     "vue": "^3.3.0",
     "vue-router": "^4.6.4"

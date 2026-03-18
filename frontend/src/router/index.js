@@ -42,7 +42,10 @@ const routes = [
   { path: '/team-archive', component: () => import('../components/TeamArchive.vue'), beforeEnter: requireAuth },
   { path: '/team-archive/write', component: () => import('../components/TeamArchiveWrite.vue'), beforeEnter: requireAuth },
   { path: '/team-archive/edit/:id', component: () => import('../components/TeamArchiveEdit.vue'), beforeEnter: requireAuth },
-  { path: '/team-archive/:id', component: () => import('../components/TeamArchiveDetail.vue'), beforeEnter: requireAuth }
+  { path: '/team-archive/:id', component: () => import('../components/TeamArchiveDetail.vue'), beforeEnter: requireAuth },
+  { path: '/faq', component: () => import('../components/Faq.vue'), beforeEnter: requireAuth },
+  { path: '/faq/write', component: () => import('../components/FaqWrite.vue'), beforeEnter: requireAdmin },
+  { path: '/faq/edit/:id', component: () => import('../components/FaqEdit.vue'), beforeEnter: requireAdmin }
 ]
 
 export default createRouter({

@@ -29,6 +29,7 @@
 
 <script>
 import FileList from './FileList.vue'
+import hljs from 'highlight.js'
 
 export default {
   name: 'PostDetailCard',
@@ -40,7 +41,9 @@ export default {
     editRoute: { type: String, required: true },
     backRoute: { type: String, required: true }
   },
-  emits: ['delete', 'file-deleted']
+  emits: ['delete', 'file-deleted'],
+  mounted() { this.$nextTick(() => hljs.highlightAll()) },
+  updated() { this.$nextTick(() => hljs.highlightAll()) }
 }
 </script>
 
@@ -68,6 +71,7 @@ export default {
 .tiptap-display p { margin: 0 0 8px 0; }
 .tiptap-display ul, .tiptap-display ol { padding-left: 24px; margin: 8px 0; }
 .tiptap-display blockquote { border-left: 3px solid #ddd; margin: 8px 0; padding: 4px 12px; color: #666; }
-.tiptap-display pre { background: #f4f4f4; border-radius: 4px; padding: 12px; font-size: 13px; overflow-x: auto; }
+.tiptap-display pre { background: #f4f4f4; border-radius: 4px; padding: 12px; overflow-x: auto; margin: 8px 0; }
+.tiptap-display pre code.hljs { background: #f4f4f4; border-radius: 4px; font-size: 13px; padding: 0; }
 .tiptap-display img { max-width: 100%; height: auto; border-radius: 4px; }
 </style>

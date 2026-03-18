@@ -30,6 +30,11 @@
           <span class="hub-label">팀별 자료실</span>
           <span class="hub-desc">소속 팀 자료 공유</span>
         </button>
+        <button @click="$router.push('/faq')" class="hub-btn faq-btn">
+          <span class="hub-icon">❓</span>
+          <span class="hub-label">FAQ</span>
+          <span class="hub-desc">자주 묻는 질문과 답변</span>
+        </button>
       </div>
     </div>
   </div>
@@ -103,4 +108,5 @@ export default {
 .board-btn { background: #f57c00; }
 .archive-btn { background: #1565c0; }
 .team-archive-btn { background: #2e7d32; }
+.faq-btn { background: #6a1b9a; }
 </style>

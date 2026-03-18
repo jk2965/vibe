@@ -57,3 +57,14 @@ CREATE TABLE vibe.vacation (
     reason     VARCHAR2(500),
     created_at VARCHAR2(30)
 );
+
+-- FAQ 테이블 (title=질문, content=답변)
+CREATE TABLE vibe.faq (
+    id           VARCHAR2(100)    NOT NULL PRIMARY KEY,
+    title        VARCHAR2(500)    NOT NULL,
+    content      VARCHAR2(32767),
+    author_id    VARCHAR2(100)    NOT NULL,
+    author_name  VARCHAR2(150)    NOT NULL,
+    created_at   VARCHAR2(30),
+    views        NUMBER(10)       DEFAULT 0
+);
