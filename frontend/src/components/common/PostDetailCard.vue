@@ -1,7 +1,13 @@
 <template>
   <div class="detail-card">
     <div class="post-header">
-      <h2 class="post-title">{{ post.title }}</h2>
+      <div class="post-title-row">
+        <h2 class="post-title">{{ post.title }}</h2>
+        <!-- 필독 설정/해제 버튼 (권한자만 표시) -->
+        <button v-if="canSetRequired" @click="$emit('toggleRequired')" class="btn-required" :class="{ active: isRequired }">
+          {{ isRequired ? '📌 필독 해제' : '📌 필독 설정' }}
+        </button>
+      </div>
       <div class="post-meta">
         <slot name="extra-meta"></slot>
         <span>{{ post.authorName }}</span>
@@ -49,10 +55,14 @@ export default {
     // 수정 버튼 클릭 시 이동할 라우트 경로 (예: /board/edit/1)
     editRoute: { type: String, required: true },
     // 목록으로 버튼 클릭 시 이동할 라우트 경로 (예: /board)
-    backRoute: { type: String, required: true }
+    backRoute: { type: String, required: true },
+    // 현재 게시글의 필독 지정 여부
+    isRequired: { type: Boolean, default: false },
+    // 필독 설정/해제 버튼 표시 여부 (관리자 또는 팀장)
+    canSetRequired: { type: Boolean, default: false }
   },
-  // delete: 삭제 버튼 클릭 시 부모에게 emit / file-deleted: 첨부파일 삭제 시 부모에게 emit
-  emits: ['delete', 'file-deleted'],
+  // delete: 삭제 버튼 클릭 시 부모에게 emit / file-deleted: 첨부파일 삭제 시 부모에게 emit / toggleRequired: 필독 설정/해제 emit
+  emits: ['delete', 'file-deleted', 'toggleRequired'],
   // 컴포넌트 마운트 후 DOM 렌더링 완료 시점에 코드 블록 구문 강조 적용
   mounted() { this.$nextTick(() => hljs.highlightAll()) },
   // 게시글 내용이 동적으로 변경될 때마다 구문 강조 재적용 (비동기 데이터 로드 후 대응)
@@ -63,7 +73,12 @@ export default {
 <style scoped>
 .detail-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; margin-bottom: 16px; }
 .post-header { border-bottom: 2px solid #eee; padding-bottom: 16px; margin-bottom: 24px; }
-.post-title { margin: 0 0 12px 0; font-size: 22px; line-height: 1.4; }
+.post-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.post-title { margin: 0; font-size: 22px; line-height: 1.4; flex: 1; }
+.btn-required { flex-shrink: 0; padding: 6px 14px; background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; border-radius: 6px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+.btn-required:hover { background: #ffe0b2; }
+.btn-required.active { background: #fce4ec; color: #c62828; border-color: #ef9a9a; }
+.btn-required.active:hover { background: #ffcdd2; }
 .post-meta { font-size: 13px; color: #888; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
 .sep { margin: 0 6px; }
 .post-content { min-height: 200px; font-size: 15px; line-height: 1.8; word-break: break-word; margin-bottom: 28px; }

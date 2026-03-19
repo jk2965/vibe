@@ -64,6 +64,8 @@ public class BoardService {
         board.setId(UUID.randomUUID().toString());
         // 현재 시각을 'yyyy-MM-dd HH:mm:ss' 형식으로 작성일 설정
         board.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        // isRequired가 null이면 0(일반)으로 초기화
+        if (board.getIsRequired() == null) board.setIsRequired(0);
         mapper.insert(board);
         return board;
     }
@@ -89,5 +91,13 @@ public class BoardService {
         // 파일을 먼저 삭제하여 고아 파일(orphan file) 방지
         fileService.deleteFilesByBoard(id);
         mapper.delete(id);
+    }
+
+    /**
+     * 게시글 필독 여부 설정: isRequired 값을 1(필독) 또는 0(해제)으로 업데이트.
+     * BoardMapper.java의 setRequired()로 BOARD 테이블 수정.
+     */
+    public void setRequired(String id, int isRequired) {
+        mapper.setRequired(id, isRequired);
     }
 }

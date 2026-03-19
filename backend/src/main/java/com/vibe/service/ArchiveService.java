@@ -67,6 +67,7 @@ public class ArchiveService {
         archive.setId(UUID.randomUUID().toString());
         // 현재 시각을 'yyyy-MM-dd HH:mm:ss' 형식으로 작성일 설정
         archive.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        if (archive.getIsRequired() == null) archive.setIsRequired(0);
         mapper.insert(archive);
         return archive;
     }
@@ -129,5 +130,13 @@ public class ArchiveService {
      */
     public void deleteFile(String fileId) {
         fileMapper.deleteById(fileId);
+    }
+
+    /**
+     * 자료실 게시글 필독 여부 설정: isRequired 값을 1(필독) 또는 0(해제)으로 업데이트.
+     * ArchiveMapper.java의 setRequired()로 ARCHIVE 테이블 수정.
+     */
+    public void setRequired(String id, int isRequired) {
+        mapper.setRequired(id, isRequired);
     }
 }

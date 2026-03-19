@@ -28,6 +28,8 @@ public class TeamArchiveVO {
     private Integer commentCount;
     /** 자료 대상 팀 이름 (UserVO.java의 team 필드와 일치) */
     private String team;
+    /** 필독 여부 (0: 일반, 1: 필독) */
+    private Integer isRequired;
     /** 첨부 파일 목록 (ArchiveFileVO.java 참조, ArchiveFileMapper.java에서 조회) */
     private List<ArchiveFileVO> files;
 
@@ -67,6 +69,10 @@ public class TeamArchiveVO {
     public String getTeam() { return team; }
     /** team 필드 설정 */
     public void setTeam(String team) { this.team = team; }
+    /** isRequired 필드 반환 */
+    public Integer getIsRequired() { return isRequired; }
+    /** isRequired 필드 설정 */
+    public void setIsRequired(Integer isRequired) { this.isRequired = isRequired; }
     /** files 필드 반환 */
     public List<ArchiveFileVO> getFiles() { return files; }
     /** files 필드 설정 */

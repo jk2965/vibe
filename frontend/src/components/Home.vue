@@ -19,7 +19,7 @@
           <span class="menu-icon">📅</span>
           <span class="menu-label">일정 관리</span>
         </button>
-        <button @click="$router.push('/board-hub')" class="menu-btn board-btn">
+        <button @click="$router.push('/notice')" class="menu-btn board-btn">
           <span class="menu-icon">📋</span>
           <span class="menu-label">게시판</span>
         </button>

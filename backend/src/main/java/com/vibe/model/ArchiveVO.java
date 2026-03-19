@@ -25,6 +25,8 @@ public class ArchiveVO {
     private Integer views;
     /** 댓글 수 (CommentVO.java 개수 집계) */
     private Integer commentCount;
+    /** 필독 여부 (0: 일반, 1: 필독) */
+    private Integer isRequired;
     /** 첨부 파일 목록 (ArchiveFileVO.java 참조, ArchiveFileMapper.java에서 조회) */
     private List<ArchiveFileVO> files;
 
@@ -60,6 +62,10 @@ public class ArchiveVO {
     public Integer getCommentCount() { return commentCount; }
     /** commentCount 필드 설정 */
     public void setCommentCount(Integer commentCount) { this.commentCount = commentCount; }
+    /** isRequired 필드 반환 */
+    public Integer getIsRequired() { return isRequired; }
+    /** isRequired 필드 설정 */
+    public void setIsRequired(Integer isRequired) { this.isRequired = isRequired; }
     /** files 필드 반환 */
     public List<ArchiveFileVO> getFiles() { return files; }
     /** files 필드 설정 */

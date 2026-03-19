@@ -4,6 +4,7 @@
     <PostWriteForm
       :submitting="submitting"
       :errorMsg="errorMsg"
+      :showRequired="canSetRequired"
       submitBtnColor="#1976d2"
       @submit="handleSubmit"
       @cancel="$router.push('/board')"
@@ -25,19 +26,26 @@ export default {
   data() {
     return {
       submitting: false,  // 제출 중 상태 플래그 (중복 제출 방지 및 버튼 비활성화 용)
-      errorMsg: ''        // 등록 실패 시 사용자에게 표시할 오류 메시지
+      errorMsg: '',       // 등록 실패 시 사용자에게 표시할 오류 메시지
+      adminLevel: parseInt(localStorage.getItem('adminLevel') || '0'),
+      isTeamLeader: localStorage.getItem('isTeamLeader') === 'true'
+    }
+  },
+  computed: {
+    canSetRequired() {
+      return this.adminLevel >= 1 || this.isTeamLeader
     }
   },
   methods: {
     // PostWriteForm.vue에서 submit 이벤트 발생 시 호출 → 게시글 생성 및 파일 업로드 처리
-    async handleSubmit({ title, content, pendingFiles }) {
+    async handleSubmit({ title, content, pendingFiles, isRequired }) {
       this.submitting = true   // 제출 시작: 버튼 비활성화
       this.errorMsg = ''       // 이전 오류 메시지 초기화
       try {
         const userId = localStorage.getItem('userId')  // 로컬스토리지에서 현재 사용자 ID 로드
         // POST /api/board → BoardController.java: 게시글 신규 생성
         const res = await axios.post('http://localhost:8090/api/board', {
-          title, content,
+          title, content, isRequired,
           authorId: userId,
           authorName: localStorage.getItem('username')  // 로컬스토리지에서 작성자명 로드
         })

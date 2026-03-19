@@ -3,31 +3,31 @@
 <mapper namespace="com.vibe.mapper.TeamNoticeMapper">
 
     <select id="findAll" resultType="com.vibe.model.TeamNoticeVO">
-        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team,
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team, n.is_required,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
         FROM vibe.team_notice n
-        ORDER BY n.team, n.created_at DESC
+        ORDER BY n.team, n.is_required DESC, n.created_at DESC
     </select>
 
     <select id="findByTeam" parameterType="String" resultType="com.vibe.model.TeamNoticeVO">
-        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team,
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team, n.is_required,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
         FROM vibe.team_notice n
         WHERE n.team = #{team}
-        ORDER BY n.created_at DESC
+        ORDER BY n.is_required DESC, n.created_at DESC
     </select>
 
     <select id="findById" parameterType="String" resultType="com.vibe.model.TeamNoticeVO">
-        SELECT id, title, content, author_id, author_name, created_at, views, team
+        SELECT id, title, content, author_id, author_name, created_at, views, team, is_required
         FROM vibe.team_notice
         WHERE id = #{id}
     </select>
 
     <insert id="insert" parameterType="com.vibe.model.TeamNoticeVO">
-        INSERT INTO vibe.team_notice (id, title, content, author_id, author_name, created_at, views, team)
+        INSERT INTO vibe.team_notice (id, title, content, author_id, author_name, created_at, views, team, is_required)
         VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
-                #{createdAt,jdbcType=VARCHAR}, 0, #{team,jdbcType=VARCHAR})
+                #{createdAt,jdbcType=VARCHAR}, 0, #{team,jdbcType=VARCHAR}, 0)
     </insert>
 
     <update id="update" parameterType="com.vibe.model.TeamNoticeVO">
@@ -43,5 +43,17 @@
     <delete id="delete" parameterType="String">
         DELETE FROM vibe.team_notice WHERE id = #{id}
     </delete>
+
+    <select id="findRequired" resultType="com.vibe.model.TeamNoticeVO">
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team, n.is_required,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.team_notice n
+        WHERE n.is_required = 1
+        ORDER BY n.created_at DESC
+    </select>
+
+    <update id="setRequired">
+        UPDATE vibe.team_notice SET is_required = #{isRequired} WHERE id = #{id}
+    </update>
 
 </mapper>

@@ -2,6 +2,7 @@ package com.vibe.mapper;
 
 import com.vibe.model.ArchiveVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +22,8 @@ public interface ArchiveMapper {
     void incrementViews(String id);
     // 자료실 게시글을 DB에서 삭제 (첨부파일은 ArchiveFileMapper.deleteByBoardId로 별도 삭제)
     void delete(String id);
+    // 자료실 게시글 필독 여부를 설정 (1=필독, 0=해제)
+    void setRequired(@Param("id") String id, @Param("isRequired") int isRequired);
+    // 필독 자료실 게시글 목록을 조회
+    List<ArchiveVO> findRequired();
 }

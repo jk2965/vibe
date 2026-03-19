@@ -4,6 +4,7 @@
     <PostWriteForm
       :submitting="submitting"
       :errorMsg="errorMsg"
+      :showRequired="canSetRequired"
       submitBtnColor="#5c6bc0"
       @submit="handleSubmit"
       @cancel="$router.push('/team-notice')"
@@ -29,12 +30,19 @@ export default {
       // 폼 제출 중 여부 (중복 제출 방지용)
       submitting: false,
       // 에러 메시지 (등록 실패 시 표시)
-      errorMsg: ''
+      errorMsg: '',
+      adminLevel: parseInt(localStorage.getItem('adminLevel') || '0'),
+      isTeamLeader: localStorage.getItem('isTeamLeader') === 'true'
+    }
+  },
+  computed: {
+    canSetRequired() {
+      return this.adminLevel >= 1 || this.isTeamLeader
     }
   },
   methods: {
     // PostWriteForm.vue에서 submit 이벤트 발생 시 호출되는 팀 공지사항 등록 핸들러
-    async handleSubmit({ title, content, pendingFiles }) {
+    async handleSubmit({ title, content, pendingFiles, isRequired }) {
       // 제출 시작: 중복 제출 방지 플래그 설정
       this.submitting = true
       this.errorMsg = ''
@@ -43,7 +51,7 @@ export default {
         const userId = localStorage.getItem('userId')
         // POST /api/team-notice 호출 → TeamNoticeController.java (팀 공지사항 등록, 팀 정보 포함)
         const res = await axios.post('http://localhost:8090/api/team-notice', {
-          title, content,
+          title, content, isRequired,
           authorId: userId,
           authorName: localStorage.getItem('username'),
           team: this.team

@@ -77,6 +77,8 @@ const routes = [
   { path: '/team-archive/edit/:id', component: () => import('../components/team-archive/TeamArchiveEdit.vue'), beforeEnter: requireAuth },
   // 팀 자료실 글 상세 (로그인 필요)
   { path: '/team-archive/:id', component: () => import('../components/team-archive/TeamArchiveDetail.vue'), beforeEnter: requireAuth },
+  // 필독 게시글 통합 목록 페이지 (로그인 필요)
+  { path: '/required', component: () => import('../components/RequiredPosts.vue'), beforeEnter: requireAuth },
   // FAQ 목록 페이지 (로그인 필요)
   { path: '/faq', component: () => import('../components/faq/Faq.vue'), beforeEnter: requireAuth },
   // FAQ 글쓰기 - 관리자/팀장만 접근 가능

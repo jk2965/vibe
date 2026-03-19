@@ -2,6 +2,7 @@ package com.vibe.mapper;
 
 import com.vibe.model.NoticeVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +22,8 @@ public interface NoticeMapper {
     void incrementViews(String id);
     // 공지사항을 DB에서 삭제
     void delete(String id);
+    // 공지사항 필독 여부를 설정 (1=필독, 0=해제)
+    void setRequired(@Param("id") String id, @Param("isRequired") int isRequired);
+    // 필독 공지사항 목록을 조회
+    List<NoticeVO> findRequired();
 }

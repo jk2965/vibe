@@ -65,6 +65,7 @@ public class NoticeService {
         notice.setId(UUID.randomUUID().toString());
         // 현재 시각을 'yyyy-MM-dd HH:mm:ss' 형식으로 작성일 설정
         notice.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        if (notice.getIsRequired() == null) notice.setIsRequired(0);
         mapper.insert(notice);
         return notice;
     }
@@ -90,5 +91,13 @@ public class NoticeService {
         // 파일을 먼저 삭제하여 고아 파일(orphan file) 방지
         fileService.deleteFilesByBoard(id);
         mapper.delete(id);
+    }
+
+    /**
+     * 공지사항 필독 여부 설정: isRequired 값을 1(필독) 또는 0(해제)으로 업데이트.
+     * NoticeMapper.java의 setRequired()로 NOTICE 테이블 수정.
+     */
+    public void setRequired(String id, int isRequired) {
+        mapper.setRequired(id, isRequired);
     }
 }

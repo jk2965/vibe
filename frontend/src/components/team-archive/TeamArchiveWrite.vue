@@ -4,6 +4,7 @@
     <PostWriteForm
       :submitting="submitting"
       :errorMsg="errorMsg"
+      :showRequired="canSetRequired"
       submitBtnColor="#2e7d32"
       @submit="handleSubmit"
       @cancel="$router.push('/team-archive')"
@@ -28,21 +29,28 @@ export default {
       // 폼 제출 중 여부 (중복 제출 방지)
       submitting: false,
       // 오류 메시지
-      errorMsg: ''
+      errorMsg: '',
+      adminLevel: parseInt(localStorage.getItem('adminLevel') || '0'),
+      isTeamLeader: localStorage.getItem('isTeamLeader') === 'true'
+    }
+  },
+  computed: {
+    canSetRequired() {
+      return this.adminLevel >= 1 || this.isTeamLeader
     }
   },
   methods: {
     // PostWriteForm에서 submit 이벤트 발생 시 호출
     // POST /api/team-archive 호출 → TeamArchiveController.java (게시글 등록)
     // POST /api/team-archive/:id/files 호출 → TeamArchiveController.java (파일 업로드, 복수)
-    async handleSubmit({ title, content, pendingFiles }) {
+    async handleSubmit({ title, content, pendingFiles, isRequired }) {
       this.submitting = true
       this.errorMsg = ''
       try {
         const userId = localStorage.getItem('userId')
         // 게시글 본문 등록 API 호출
         const res = await axios.post('http://localhost:8090/api/team-archive', {
-          title, content,
+          title, content, isRequired,
           authorId: userId,
           authorName: localStorage.getItem('username'),
           team: this.team

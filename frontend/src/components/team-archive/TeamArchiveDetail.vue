@@ -6,10 +6,13 @@
       :post="post"
       :canEdit="canEdit"
       :canDelete="canDelete"
+      :isRequired="isRequired"
+      :canSetRequired="canSetRequired"
       :editRoute="`/team-archive/edit/${post.id}`"
       backRoute="/team-archive"
       @delete="deletePost"
       @file-deleted="id => post.files = post.files.filter(f => f.id !== id)"
+      @toggleRequired="toggleRequired"
     >
       <template #extra-meta>
         <span class="team-badge">{{ post.team }}</span>
@@ -40,14 +43,18 @@ export default {
       // 현재 로그인한 사용자 ID
       userId: localStorage.getItem('userId') || '',
       // 현재 로그인한 사용자의 관리자 레벨
-      adminLevel: parseInt(localStorage.getItem('adminLevel') || '0')
+      adminLevel: parseInt(localStorage.getItem('adminLevel') || '0'),
+      isRequired: false,
+      isTeamLeader: localStorage.getItem('isTeamLeader') === 'true'
     }
   },
   computed: {
     // 수정 권한: 작성자 본인만 가능
     canEdit() { return this.post && this.post.authorId === this.userId },
     // 삭제 권한: 작성자 본인 또는 관리자(adminLevel 1 이상)
-    canDelete() { return this.post && (this.post.authorId === this.userId || this.adminLevel >= 1) }
+    canDelete() { return this.post && (this.post.authorId === this.userId || this.adminLevel >= 1) },
+    // 필독 설정 권한: 관리자(adminLevel >= 1) 또는 팀장
+    canSetRequired() { return this.adminLevel >= 1 || this.isTeamLeader }
   },
   // 컴포넌트 마운트 시 게시글 상세 조회
   mounted() {
@@ -63,12 +70,26 @@ export default {
         })
         // 게시글 상세 데이터 저장 (files 배열 포함)
         this.post = res.data
+        this.isRequired = !!res.data.isRequired
       } catch (e) {
         // 403 Forbidden: 다른 팀 자료실 접근 시 권한 없음 처리
         if (e.response?.status === 403) {
           alert('접근 권한이 없습니다.')
           this.$router.push('/team-archive')
         }
+      }
+    },
+    // PATCH /api/team-archive/:id/required → 필독 설정/해제 토글
+    async toggleRequired() {
+      const newVal = this.isRequired ? 0 : 1
+      try {
+        await axios.patch(`http://localhost:8090/api/team-archive/${this.$route.params.id}/required`,
+          { isRequired: newVal },
+          { params: { requesterId: localStorage.getItem('userId') } }
+        )
+        this.isRequired = !this.isRequired
+      } catch (e) {
+        alert(e.response?.data?.message || '필독 설정에 실패했습니다.')
       }
     },
     // DELETE /api/team-archive/:id 호출 → TeamArchiveController.java

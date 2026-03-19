@@ -6,10 +6,13 @@
       :post="post"
       :canEdit="canEdit"
       :canDelete="canDelete"
+      :isRequired="isRequired"
+      :canSetRequired="canSetRequired"
       :editRoute="`/team-notice/edit/${post.id}`"
       backRoute="/team-notice"
       @delete="deletePost"
       @file-deleted="id => post.files = post.files.filter(f => f.id !== id)"
+      @toggleRequired="toggleRequired"
     >
       <template #extra-meta>
         <span class="team-badge">{{ post.team }}</span>
@@ -41,14 +44,18 @@ export default {
       // 현재 로그인 사용자 ID (권한 확인에 사용)
       userId: localStorage.getItem('userId') || '',
       // 관리자 레벨 (0: 일반, 1 이상: 관리자)
-      adminLevel: parseInt(localStorage.getItem('adminLevel') || '0')
+      adminLevel: parseInt(localStorage.getItem('adminLevel') || '0'),
+      isRequired: false,
+      isTeamLeader: localStorage.getItem('isTeamLeader') === 'true'
     }
   },
   computed: {
     // 수정 권한: 본인 작성 게시글인 경우에만 허용
     canEdit() { return this.post && this.post.authorId === this.userId },
     // 삭제 권한: 본인 작성이거나 관리자(레벨 1 이상)인 경우 허용
-    canDelete() { return this.post && (this.post.authorId === this.userId || this.adminLevel >= 1) }
+    canDelete() { return this.post && (this.post.authorId === this.userId || this.adminLevel >= 1) },
+    // 필독 설정 권한: 관리자(adminLevel >= 1) 또는 팀장
+    canSetRequired() { return this.adminLevel >= 1 || this.isTeamLeader }
   },
   // 컴포넌트 마운트 시 팀 공지사항 상세 데이터 로드
   mounted() {
@@ -63,12 +70,26 @@ export default {
         })
         // 응답 데이터를 post에 저장
         this.post = res.data
+        this.isRequired = !!res.data.isRequired
       } catch (e) {
         // 403 에러: 다른 팀 게시글 접근 시 목록으로 리다이렉트
         if (e.response?.status === 403) {
           alert('접근 권한이 없습니다.')
           this.$router.push('/team-notice')
         }
+      }
+    },
+    // PATCH /api/team-notice/:id/required → 필독 설정/해제 토글
+    async toggleRequired() {
+      const newVal = this.isRequired ? 0 : 1
+      try {
+        await axios.patch(`http://localhost:8090/api/team-notice/${this.$route.params.id}/required`,
+          { isRequired: newVal },
+          { params: { requesterId: localStorage.getItem('userId') } }
+        )
+        this.isRequired = !this.isRequired
+      } catch (e) {
+        alert(e.response?.data?.message || '필독 설정에 실패했습니다.')
       }
     },
     // DELETE /api/team-notice/:id 호출 → TeamNoticeController.java (삭제 후 목록으로 이동)

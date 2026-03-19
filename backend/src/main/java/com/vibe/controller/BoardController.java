@@ -136,6 +136,27 @@ public class BoardController {
     }
 
     /**
+     * 게시글 필독 여부 설정 엔드포인트. 관리자 또는 팀장만 설정 가능.
+     * 프론트엔드에서 PATCH /api/board/{id}/required?requesterId={id} 요청
+     * BoardService.java의 setRequired() 호출
+     */
+    @PatchMapping("/{id}/required")
+    public ResponseEntity<?> setRequired(@PathVariable String id,
+                                         @RequestParam String requesterId,
+                                         @RequestBody Map<String, Integer> body) {
+        // UserService.java의 isAdmin(), isTeamLeader()로 권한 확인
+        boolean isAdmin = userService.isAdmin(requesterId);
+        boolean isTeamLeader = userService.isTeamLeader(requesterId);
+        if (!isAdmin && !isTeamLeader) {
+            return ResponseEntity.status(403).body(Map.of("message", "권한이 없습니다."));
+        }
+        int value = body.getOrDefault("isRequired", 0);
+        // BoardService.java의 setRequired()로 필독 여부 업데이트
+        boardService.setRequired(id, value);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
      * 게시글 첨부파일 업로드 엔드포인트. 파일을 서버 디스크에 저장하고 메타데이터를 DB에 기록.
      * 프론트엔드 PostDetailCard.vue에서 POST /api/board/{id}/files 요청
      * FileService.java의 saveFile() 호출

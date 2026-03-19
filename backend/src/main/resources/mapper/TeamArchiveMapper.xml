@@ -3,25 +3,25 @@
 <mapper namespace="com.vibe.mapper.TeamArchiveMapper">
 
     <select id="findByTeam" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
-        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team,
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
         FROM vibe.team_archive a
         WHERE a.team = #{team}
-        ORDER BY a.created_at DESC
+        ORDER BY a.is_required DESC, a.created_at DESC
     </select>
 
     <select id="findById" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
-        SELECT id, title, content, author_id, author_name, created_at, views, team
+        SELECT id, title, content, author_id, author_name, created_at, views, team, is_required
         FROM vibe.team_archive
         WHERE id = #{id}
     </select>
 
     <insert id="insert" parameterType="com.vibe.model.TeamArchiveVO">
-        INSERT INTO vibe.team_archive (id, title, content, author_id, author_name, created_at, views, team)
+        INSERT INTO vibe.team_archive (id, title, content, author_id, author_name, created_at, views, team, is_required)
         VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
-                #{createdAt,jdbcType=VARCHAR}, 0, #{team,jdbcType=VARCHAR})
+                #{createdAt,jdbcType=VARCHAR}, 0, #{team,jdbcType=VARCHAR}, 0)
     </insert>
 
     <update id="update" parameterType="com.vibe.model.TeamArchiveVO">
@@ -37,5 +37,18 @@
     <delete id="delete" parameterType="String">
         DELETE FROM vibe.team_archive WHERE id = #{id}
     </delete>
+
+    <select id="findRequired" resultType="com.vibe.model.TeamArchiveVO">
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
+               (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
+        FROM vibe.team_archive a
+        WHERE a.is_required = 1
+        ORDER BY a.created_at DESC
+    </select>
+
+    <update id="setRequired">
+        UPDATE vibe.team_archive SET is_required = #{isRequired} WHERE id = #{id}
+    </update>
 
 </mapper>
