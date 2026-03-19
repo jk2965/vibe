@@ -13,36 +13,47 @@
 
 <script>
 import axios from 'axios'
+// PageHeader.vue 공통 헤더 컴포넌트 사용
 import PageHeader from '../common/PageHeader.vue'
+// PostWriteForm.vue 게시글 작성 폼 공통 컴포넌트 사용
 import PostWriteForm from '../common/PostWriteForm.vue'
 
 export default {
   name: 'ArchiveWrite',
+  // PageHeader.vue, PostWriteForm.vue 컴포넌트 등록
   components: { PageHeader, PostWriteForm },
   data() {
-    return { submitting: false, errorMsg: '' }
+    return {
+      submitting: false,  // 제출 중 상태 플래그 (중복 제출 방지 및 버튼 비활성화 용)
+      errorMsg: ''        // 등록 실패 시 사용자에게 표시할 오류 메시지
+    }
   },
   methods: {
+    // PostWriteForm.vue에서 submit 이벤트 발생 시 호출 → 자료 생성 및 파일 업로드 처리
     async handleSubmit({ title, content, pendingFiles }) {
-      this.submitting = true
-      this.errorMsg = ''
+      this.submitting = true   // 제출 시작: 버튼 비활성화
+      this.errorMsg = ''       // 이전 오류 메시지 초기화
       try {
-        const userId = localStorage.getItem('userId')
+        const userId = localStorage.getItem('userId')  // 로컬스토리지에서 현재 사용자 ID 로드
+        // POST /api/archive → ArchiveController.java: 자료 신규 생성 (requesterId로 권한 검증)
         const res = await axios.post('http://localhost:8090/api/archive', {
           title, content,
           authorId: userId,
-          authorName: localStorage.getItem('username')
+          authorName: localStorage.getItem('username')  // 로컬스토리지에서 작성자명 로드
         }, { params: { requesterId: userId } })
+        // 첨부 파일이 있는 경우 순차적으로 업로드
         for (const file of pendingFiles) {
           const fd = new FormData()
           fd.append('file', file)
+          // POST /api/archive/:id/files → ArchiveController.java: 파일 첨부 업로드
           await axios.post(`http://localhost:8090/api/archive/${res.data.id}/files`, fd, { params: { requesterId: userId } })
         }
+        // 등록 완료 후 생성된 자료 상세 페이지로 이동 → ArchiveDetail.vue
         this.$router.push(`/archive/${res.data.id}`)
       } catch (e) {
         this.errorMsg = e.response?.data?.message || '등록에 실패했습니다.'
       } finally {
-        this.submitting = false
+        this.submitting = false  // 제출 완료: 버튼 다시 활성화
       }
     }
   }

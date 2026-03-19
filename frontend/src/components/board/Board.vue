@@ -52,21 +52,24 @@
 
 <script>
 import axios from 'axios'
+// PageHeader.vue 공통 헤더 컴포넌트 사용
 import PageHeader from '../common/PageHeader.vue'
 
 export default {
   name: 'Board',
+  // PageHeader.vue 컴포넌트 등록
   components: { PageHeader },
   data() {
     return {
-      posts: [],
-      pageNum: 1,
-      totalPages: 1,
-      totalCount: 0,
-      userId: localStorage.getItem('userId') || ''
+      posts: [],        // 게시글 목록 배열
+      pageNum: 1,       // 현재 페이지 번호
+      totalPages: 1,    // 전체 페이지 수
+      totalCount: 0,    // 전체 게시글 수 (역순 번호 계산에 사용)
+      userId: localStorage.getItem('userId') || ''  // 로컬스토리지에서 현재 로그인 사용자 ID 로드
     }
   },
   computed: {
+    // 현재 페이지 그룹에 해당하는 페이지 번호 배열 반환 (5개 단위로 그룹화)
     pageRange() {
       const start = Math.floor((this.pageNum - 1) / 5) * 5 + 1
       const end = Math.min(start + 4, this.totalPages)
@@ -75,30 +78,35 @@ export default {
       return range
     }
   },
+  // 컴포넌트 마운트 시 게시글 목록을 즉시 조회
   mounted() {
     this.fetchPosts()
   },
   methods: {
+    // GET /api/board → BoardController.java: 자유 게시판 목록 페이징 조회
     async fetchPosts() {
       try {
         const res = await axios.get('http://localhost:8090/api/board', {
-          params: { pageNum: this.pageNum }
+          params: { pageNum: this.pageNum }  // 현재 페이지 번호를 쿼리 파라미터로 전달
         })
-        this.posts = res.data.list
-        this.totalPages = res.data.pages
-        this.totalCount = res.data.total
+        this.posts = res.data.list        // 게시글 목록 저장
+        this.totalPages = res.data.pages  // 전체 페이지 수 저장
+        this.totalCount = res.data.total  // 전체 게시글 수 저장
       } catch (e) {
         console.error('게시글 목록 조회 실패:', e)
       }
     },
+    // 페이지 변경 처리: 유효 범위 체크 후 해당 페이지 데이터 재조회
     changePage(p) {
       if (p < 1 || p > this.totalPages) return
       this.pageNum = p
       this.fetchPosts()
     },
+    // 게시글 상세 페이지로 이동 → BoardDetail.vue
     goDetail(id) {
       this.$router.push(`/board/${id}`)
     },
+    // 날짜 문자열에서 연-월-일(YYYY-MM-DD) 부분만 추출하여 반환
     formatDate(dateStr) {
       if (!dateStr) return '-'
       return dateStr.substring(0, 10)

@@ -41,17 +41,21 @@
 </template>
 
 <script>
+// 공통 페이지 헤더 컴포넌트 (PageHeader.vue)
 import PageHeader from './common/PageHeader.vue'
 
 export default {
   name: 'BoardHub',
+  // API 호출 없음 - 로컬스토리지 기반으로 메뉴 표시 여부만 계산
   components: { PageHeader },
   computed: {
+    // 팀별 공지사항 접근 권한: 슈퍼 관리자(adminLevel 2 이상) 또는 팀 소속 사용자
     canAccessTeamNotice() {
       const adminLevel = parseInt(localStorage.getItem('adminLevel') || '0')
       const team = localStorage.getItem('team') || ''
       return adminLevel >= 2 || !!team
     },
+    // 팀별 자료실 접근 권한: 슈퍼 관리자(adminLevel 2 이상) 또는 팀 소속 사용자
     canAccessTeamArchive() {
       const adminLevel = parseInt(localStorage.getItem('adminLevel') || '0')
       const team = localStorage.getItem('team') || ''

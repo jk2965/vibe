@@ -57,19 +57,32 @@ export default {
   name: 'Login',
   data() {
     return {
+      // 로그인 폼: 사용자가 입력하는 아이디
       userId: '',
+      // 로그인 폼: 사용자가 입력하는 비밀번호
       password: '',
+      // 로그인 실패 오류 메시지
       errorMsg: '',
+      // 회원가입 모달 표시 여부
       showRegister: false,
+      // 회원가입 폼: 새로 등록할 아이디
       regUserId: '',
+      // 회원가입 폼: 새로 등록할 이름
       regUsername: '',
+      // 회원가입 폼: 새로 등록할 비밀번호
       regPassword: '',
+      // 회원가입 폼: 기본 직급 (고정값 '사원')
       regPosition: '사원',
+      // 회원가입 오류/안내 메시지
       regMsg: '',
+      // 회원가입 완료 팝업 표시 여부
       showSuccess: false
     }
   },
   methods: {
+    // POST /api/auth/login 호출 → AuthController.java
+    // 로그인 성공 시 사용자 정보(username, position, adminLevel, team, isTeamLeader)를
+    // 로컬스토리지에 저장하고 홈 화면으로 이동
     async login() {
       try {
         const res = await axios.post('http://localhost:8090/api/auth/login', {
@@ -77,6 +90,7 @@ export default {
           password: this.password
         })
         if (res.data.success) {
+          // 이후 모든 컴포넌트에서 로컬스토리지로 인증 정보 참조
           localStorage.setItem('loggedIn', 'true')
           localStorage.setItem('userId', this.userId)
           localStorage.setItem('username', res.data.username)
@@ -90,6 +104,8 @@ export default {
         this.errorMsg = e.response?.data?.message || '로그인 실패'
       }
     },
+    // POST /api/auth/register 호출 → AuthController.java
+    // 회원가입 성공 시 모달을 닫고 완료 팝업을 표시, 폼 초기화
     async register() {
       try {
         const res = await axios.post('http://localhost:8090/api/auth/register', {
@@ -99,8 +115,10 @@ export default {
           position: this.regPosition
         })
         if (res.data.success) {
+          // 회원가입 모달 닫기, 완료 팝업 표시
           this.showRegister = false
           this.showSuccess = true
+          // 회원가입 폼 초기화
           this.regUserId = ''
           this.regUsername = ''
           this.regPassword = ''

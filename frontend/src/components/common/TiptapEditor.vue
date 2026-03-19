@@ -29,6 +29,8 @@
       <span class="divider"></span>
       <button type="button" @click="triggerImage" title="이미지 삽입">이미지</button>
       <input ref="imageInput" type="file" accept="image/*" style="display:none" @change="handleImageUpload">
+      <button type="button" @click="insertYoutube" title="YouTube 영상 삽입">YouTube</button>
+      <button type="button" @click="insertIframe" title="외부 영상/URL 임베드">외부영상</button>
       <span class="divider"></span>
       <button type="button" @click="editor.chain().focus().unsetAllMarks().clearNodes().run()" title="서식 초기화">초기화</button>
     </div>
@@ -37,13 +39,49 @@
 </template>
 
 <script>
+// Tiptap Vue 3용 에디터 코어 및 렌더링 컴포넌트 임포트
 import { Editor, EditorContent } from '@tiptap/vue-3'
+// Tiptap 커스텀 노드 생성을 위한 Node 클래스 임포트
+import { Node } from '@tiptap/core'
+// 기본 에디터 기능 묶음 (굵기, 기울임, 목록, 인용, 코드 등) 임포트
 import StarterKit from '@tiptap/starter-kit'
+// 이미지 삽입 확장 임포트
 import Image from '@tiptap/extension-image'
+// 밑줄 확장 임포트
 import Underline from '@tiptap/extension-underline'
+// 하이퍼링크 확장 임포트
 import Link from '@tiptap/extension-link'
+// 구문 강조 지원 코드 블록 확장 임포트 (lowlight 연동, main.js의 highlight.js CSS와 연동)
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+// YouTube 영상 임베드 확장 임포트
+import Youtube from '@tiptap/extension-youtube'
+
+// 외부 iframe 임베드를 위한 커스텀 Tiptap 노드 정의 (네이버TV, 카카오TV, Vimeo 등)
+const IframeExtension = Node.create({
+  name: 'iframe',
+  group: 'block',
+  atom: true,
+  addAttributes() {
+    return {
+      src: { default: null },
+      width: { default: '100%' },
+      height: { default: '360' },
+    }
+  },
+  parseHTML() { return [{ tag: 'iframe[src]' }] },
+  renderHTML({ HTMLAttributes }) {
+    return ['iframe', { ...HTMLAttributes, frameborder: '0', allowfullscreen: 'true', style: 'max-width:100%;border-radius:6px;display:block;margin:8px 0;' }]
+  },
+  addCommands() {
+    return {
+      setIframe: (options) => ({ commands }) =>
+        commands.insertContent({ type: this.name, attrs: options })
+    }
+  }
+})
+// 코드 구문 강조를 위한 lowlight 코어 임포트
 import { lowlight } from 'lowlight/lib/core'
+// 지원 언어 개별 임포트 (highlight.js 기반)
 import javascript from 'highlight.js/lib/languages/javascript'
 import java from 'highlight.js/lib/languages/java'
 import xml from 'highlight.js/lib/languages/xml'
@@ -51,29 +89,41 @@ import css from 'highlight.js/lib/languages/css'
 import python from 'highlight.js/lib/languages/python'
 import sql from 'highlight.js/lib/languages/sql'
 import bash from 'highlight.js/lib/languages/bash'
+// 이미지 업로드 API 호출을 위한 axios 임포트
 import axios from 'axios'
 
+// lowlight에 각 언어 등록 (코드 블록에서 해당 언어 구문 강조 활성화)
 lowlight.registerLanguage('javascript', javascript)
 lowlight.registerLanguage('java', java)
 lowlight.registerLanguage('xml', xml)
+// html은 xml 파서로 처리
 lowlight.registerLanguage('html', xml)
 lowlight.registerLanguage('css', css)
 lowlight.registerLanguage('python', python)
 lowlight.registerLanguage('sql', sql)
 lowlight.registerLanguage('bash', bash)
 
+// PostWriteForm.vue와 PostEditForm.vue에서 v-model로 사용되는 리치 텍스트 에디터 컴포넌트
 export default {
   name: 'TiptapEditor',
+  // EditorContent: Tiptap이 실제 에디터 DOM을 렌더링하는 컴포넌트
   components: { EditorContent },
   props: {
+    // 부모로부터 v-model로 전달받는 HTML 문자열 (초기 에디터 내용)
     modelValue: { type: String, default: '' },
+    // 이미지 업로드 API 엔드포인트 URL (부모 컴포넌트에서 주입)
     imageUploadUrl: { type: String, required: true }
   },
+  // 에디터 내용 변경 시 부모에게 HTML 값을 emit
   emits: ['update:modelValue'],
   data() {
-    return { editor: null }
+    return {
+      // Tiptap Editor 인스턴스 (mounted에서 초기화)
+      editor: null
+    }
   },
   watch: {
+    // 부모의 modelValue가 외부에서 변경될 때 에디터 내용을 동기화 (무한 루프 방지를 위해 값 비교 후 설정)
     modelValue(val) {
       if (this.editor && this.editor.getHTML() !== val) {
         this.editor.commands.setContent(val, false)
@@ -81,48 +131,81 @@ export default {
     }
   },
   mounted() {
+    // 컴포넌트 마운트 시 Tiptap 에디터 인스턴스 생성 및 확장 등록
     this.editor = new Editor({
+      // 초기 내용은 부모로부터 전달받은 HTML 문자열
       content: this.modelValue,
       extensions: [
+        // StarterKit에서 기본 codeBlock은 비활성화 (CodeBlockLowlight로 대체)
         StarterKit.configure({ codeBlock: false }),
+        // 이미지 삽입 지원
         Image,
+        // 밑줄 지원
         Underline,
+        // 링크: 클릭 시 자동 이동 비활성화, 자동 링크 감지 활성화
         Link.configure({ openOnClick: false, autolink: true }),
-        CodeBlockLowlight.configure({ lowlight })
+        // lowlight 기반 구문 강조 코드 블록
+        CodeBlockLowlight.configure({ lowlight }),
+        // YouTube: 개인정보 보호 모드(nocookie) 활성화
+        Youtube.configure({ width: 640, height: 360, nocookie: true }),
+        // 커스텀 iframe 임베드 확장
+        IframeExtension
       ],
+      // 에디터 내용이 변경될 때마다 부모 컴포넌트에 HTML 값 emit
       onUpdate: () => {
         this.$emit('update:modelValue', this.editor.getHTML())
       }
     })
   },
   beforeUnmount() {
+    // 컴포넌트 언마운트 전 에디터 인스턴스 메모리 해제
     this.editor.destroy()
   },
   methods: {
+    // 코드 블록 언어 선택 드롭다운 변경 시 해당 언어로 코드 블록 토글
     setCodeBlock(e) {
       const lang = e.target.value
+      // 선택 후 드롭다운을 초기 상태로 리셋
       e.target.value = ''
       this.editor.chain().focus().toggleCodeBlock({ language: lang || 'plaintext' }).run()
     },
+    // YouTube URL을 입력받아 에디터에 YouTube 영상 삽입
+    insertYoutube() {
+      const url = prompt('YouTube URL을 입력하세요:')
+      if (!url) return
+      this.editor.chain().focus().setYoutubeVideo({ src: url }).run()
+    },
+    // 외부 영상/미디어 embed URL을 입력받아 커스텀 iframe 노드로 삽입
+    insertIframe() {
+      const url = prompt('임베드 URL을 입력하세요:\n(예: 네이버TV, 카카오TV, Vimeo 등의 embed URL)')
+      if (!url) return
+      this.editor.chain().focus().setIframe({ src: url }).run()
+    },
+    // URL을 입력받아 선택된 텍스트에 하이퍼링크 설정 (새 탭에서 열림)
     setLink() {
       const url = prompt('URL을 입력하세요:', 'https://')
       if (!url) return
       this.editor.chain().focus().setLink({ href: url, target: '_blank' }).run()
     },
+    // 숨겨진 파일 input을 클릭하여 이미지 선택 다이얼로그 열기
     triggerImage() {
       this.$refs.imageInput.click()
     },
+    // 선택한 이미지 파일을 서버(imageUploadUrl)에 업로드 후 에디터에 삽입하는 비동기 메서드
     async handleImageUpload(e) {
       const file = e.target.files[0]
       if (!file) return
       const fd = new FormData()
       fd.append('file', file)
       try {
+        // imageUploadUrl prop으로 전달된 API 엔드포인트에 이미지 업로드 요청
         const res = await axios.post(this.imageUploadUrl, fd)
+        // 서버에서 반환된 이미지 URL을 에디터에 삽입
         this.editor.chain().focus().setImage({ src: res.data.url }).run()
       } catch {
         alert('이미지 업로드에 실패했습니다.')
       }
+      // 같은 파일을 다시 업로드할 수 있도록 input 초기화
       e.target.value = ''
     }
   }
@@ -191,6 +274,7 @@ export default {
 .tiptap-content .ProseMirror pre { background: #f4f4f4; border-radius: 4px; padding: 12px; font-size: 13px; overflow-x: auto; }
 .tiptap-content .ProseMirror img { max-width: 100%; height: auto; border-radius: 4px; }
 .tiptap-content .ProseMirror a { color: #1565c0; text-decoration: underline; cursor: pointer; }
+.tiptap-content .ProseMirror iframe { max-width: 100%; border-radius: 6px; display: block; margin: 8px 0; }
 .tiptap-content .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   color: #aaa;

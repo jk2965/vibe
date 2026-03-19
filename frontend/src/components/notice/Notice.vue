@@ -51,23 +51,33 @@
 
 <script>
 import axios from 'axios'
+// PageHeader.vue 공통 헤더 컴포넌트 사용
 import PageHeader from '../common/PageHeader.vue'
 
 export default {
   name: 'Notice',
+  // PageHeader.vue 컴포넌트 등록
   components: { PageHeader },
   data() {
+    // localStorage에서 관리자 레벨 읽기 (0: 일반, 1: 팀장/중간관리자, 2: 최고관리자)
     const adminLevel = parseInt(localStorage.getItem('adminLevel') || '0')
+    // localStorage에서 팀장 여부 읽기
     const isTeamLeader = localStorage.getItem('isTeamLeader') === 'true'
     return {
+      // 공지사항 목록 배열
       posts: [],
+      // 현재 페이지 번호 (1부터 시작)
       pageNum: 1,
+      // 전체 페이지 수
       totalPages: 1,
+      // 전체 게시글 수 (역순 번호 계산에 사용)
       totalCount: 0,
+      // 글쓰기 버튼 노출 여부: 관리자(레벨 1 이상) 또는 팀장인 경우 가능
       canWrite: adminLevel >= 1 || isTeamLeader
     }
   },
   computed: {
+    // 현재 페이지 그룹에서 표시할 페이지 번호 배열 (최대 5개씩 표시)
     pageRange() {
       const start = Math.floor((this.pageNum - 1) / 5) * 5 + 1
       const end = Math.min(start + 4, this.totalPages)
@@ -76,15 +86,18 @@ export default {
       return range
     }
   },
+  // 컴포넌트 마운트 시 공지사항 목록 최초 로드
   mounted() {
     this.fetchPosts()
   },
   methods: {
+    // GET /api/notice 호출 → NoticeController.java (페이지네이션 포함 목록 조회)
     async fetchPosts() {
       try {
         const res = await axios.get('http://localhost:8090/api/notice', {
           params: { pageNum: this.pageNum }
         })
+        // 응답에서 게시글 목록, 전체 페이지 수, 전체 게시글 수 저장
         this.posts = res.data.list
         this.totalPages = res.data.pages
         this.totalCount = res.data.total
@@ -92,14 +105,17 @@ export default {
         console.error('공지사항 목록 조회 실패:', e)
       }
     },
+    // 페이지 변경: 유효 범위 체크 후 해당 페이지 데이터 재조회
     changePage(p) {
       if (p < 1 || p > this.totalPages) return
       this.pageNum = p
       this.fetchPosts()
     },
+    // 공지사항 상세 페이지로 이동 → NoticeDetail.vue
     goDetail(id) {
       this.$router.push(`/notice/${id}`)
     },
+    // 날짜 문자열을 YYYY-MM-DD 형식으로 변환 (날짜 없으면 '-' 반환)
     formatDate(dateStr) {
       if (!dateStr) return '-'
       return dateStr.substring(0, 10)

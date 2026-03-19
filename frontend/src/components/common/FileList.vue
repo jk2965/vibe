@@ -14,30 +14,41 @@
 </template>
 
 <script>
+// 파일 삭제 API 호출을 위한 axios 임포트
 import axios from 'axios'
 
+// 첨부파일 목록 표시 컴포넌트 - PostDetailCard.vue와 PostEditForm.vue에서 사용
+// 다운로드 및 (canDelete=true 시) 서버에서 파일 삭제 기능 제공
 export default {
   name: 'FileList',
   props: {
+    // 표시할 파일 객체 배열 (id, originalName, fileSize 필드 포함)
     files: { type: Array, default: () => [] },
+    // 삭제 버튼 표시 여부 (작성자/관리자일 때 true, PostDetailCard에서 canDelete prop 전달)
     canDelete: { type: Boolean, default: false }
   },
+  // 파일 삭제 후 부모 컴포넌트에 삭제된 파일 ID를 emit (부모에서 로컬 목록 갱신)
   emits: ['file-deleted'],
   methods: {
+    // 새 탭에서 파일 다운로드 (GET /api/archive/files/:id/download)
     download(file) {
       window.open(`http://localhost:8090/api/archive/files/${file.id}/download`, '_blank')
     },
+    // DELETE /api/archive/files/:id - 서버에서 파일 삭제 후 부모에게 file-deleted 이벤트 emit
     async remove(file) {
       if (!confirm(`'${file.originalName}' 파일을 삭제하시겠습니까?`)) return
       try {
         await axios.delete(`http://localhost:8090/api/archive/files/${file.id}`, {
+          // requesterId 쿼리 파라미터로 본인/권한 확인
           params: { requesterId: localStorage.getItem('userId') }
         })
+        // 삭제 성공 시 부모에게 삭제된 파일 ID 전달 (PostEditForm에서 로컬 목록 갱신)
         this.$emit('file-deleted', file.id)
       } catch (e) {
         alert('파일 삭제에 실패했습니다.')
       }
     },
+    // 바이트 단위 파일 크기를 사람이 읽기 쉬운 형식으로 변환 (B / KB / MB)
     formatSize(bytes) {
       if (!bytes) return ''
       if (bytes < 1024) return bytes + 'B'

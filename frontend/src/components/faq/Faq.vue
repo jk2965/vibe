@@ -55,7 +55,9 @@
 
 <script>
 import axios from 'axios'
+// 공통 페이지 헤더 컴포넌트 (PageHeader.vue)
 import PageHeader from '../common/PageHeader.vue'
+// 코드 블록 신택스 하이라이팅 라이브러리 (highlight.js) - Tiptap 에디터 본문의 코드 블록 강조
 import hljs from 'highlight.js'
 
 export default {
@@ -63,16 +65,24 @@ export default {
   components: { PageHeader },
   data() {
     return {
+      // FAQ 목록 (각 항목에 fullContent: null을 추가해 lazy loading 구현)
       faqs: [],
+      // 현재 페이지 번호
       pageNum: 1,
+      // 전체 페이지 수
       totalPages: 1,
+      // 현재 펼쳐진(아코디언) FAQ 항목 ID (한 번에 하나만 펼침)
       openId: null
     }
   },
   computed: {
+    // 현재 로그인한 사용자 ID
     userId() { return localStorage.getItem('userId') || '' },
+    // 현재 사용자의 관리자 레벨
     adminLevel() { return parseInt(localStorage.getItem('adminLevel') || '0') },
+    // 관리자 여부 (adminLevel 1 이상이면 FAQ 등록/수정/삭제 가능)
     isAdmin() { return this.adminLevel >= 1 },
+    // 페이지네이션: 5개 단위로 페이지 번호 배열 계산
     pageRange() {
       const start = Math.floor((this.pageNum - 1) / 5) * 5 + 1
       const end = Math.min(start + 4, this.totalPages)
@@ -81,27 +91,37 @@ export default {
       return range
     }
   },
+  // 컴포넌트 마운트 시 FAQ 목록 조회
   mounted() {
     this.fetchFaqs()
   },
+  // DOM 업데이트 후 highlight.js로 코드 블록 재하이라이팅 (아코디언 펼칠 때마다 실행)
   updated() { this.$nextTick(() => hljs.highlightAll()) },
   methods: {
+    // GET /api/faq 호출 → FaqController.java
+    // 페이지별 FAQ 목록 조회, fullContent는 아코디언 열 때 lazy loading
     async fetchFaqs() {
       try {
         const res = await axios.get('/api/faq', { params: { pageNum: this.pageNum } })
+        // 각 FAQ에 fullContent: null 추가 (상세 내용 lazy loading용)
         this.faqs = res.data.list.map(f => ({ ...f, fullContent: null }))
         this.totalPages = res.data.pages
+        // 페이지 변경 시 열린 아코디언 초기화
         this.openId = null
       } catch (e) {
         console.error('FAQ 목록 조회 실패:', e)
       }
     },
+    // 아코디언 토글: 같은 항목 클릭 시 닫고, 다른 항목 클릭 시 열기
+    // GET /api/faq/:id 호출 → FaqController.java (fullContent가 없을 때만 상세 조회)
     async toggle(faq) {
       if (this.openId === faq.id) {
+        // 이미 열린 항목 클릭 시 닫기
         this.openId = null
         return
       }
       this.openId = faq.id
+      // fullContent가 null인 경우에만 상세 내용 API 호출 (중복 호출 방지)
       if (!faq.fullContent) {
         try {
           const res = await axios.get(`/api/faq/${faq.id}`)
@@ -111,17 +131,22 @@ export default {
         }
       }
     },
+    // 페이지 번호 클릭 시 해당 페이지로 이동하고 목록 재조회
     changePage(p) {
       if (p < 1 || p > this.totalPages) return
       this.pageNum = p
       this.fetchFaqs()
     },
+    // 현재 사용자가 해당 FAQ의 작성자인지 확인
     isAuthor(faq) {
       return faq.authorId === this.userId
     },
+    // 삭제 권한: 작성자 본인 또는 관리자
     canDelete(faq) {
       return faq.authorId === this.userId || this.isAdmin
     },
+    // DELETE /api/faq/:id 호출 → FaqController.java
+    // 삭제 확인 후 FAQ 삭제, 성공 시 목록 새로고침
     async confirmDelete(id) {
       if (!confirm('질문을 삭제하시겠습니까?')) return
       try {
@@ -131,6 +156,7 @@ export default {
         alert(e.response?.data?.message || '삭제 중 오류가 발생했습니다.')
       }
     },
+    // 날짜 문자열에서 'YYYY-MM-DD' 형식만 추출
     formatDate(dateStr) {
       if (!dateStr) return '-'
       return dateStr.substring(0, 10)

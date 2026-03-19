@@ -28,21 +28,34 @@
 </template>
 
 <script>
+// FileList.vue: 첨부파일 목록 표시 및 삭제 컴포넌트
 import FileList from './FileList.vue'
+// highlight.js: 본문 내 코드 블록 구문 강조 처리 (main.js에서 github.css 로드됨)
 import hljs from 'highlight.js'
 
+// 게시글 상세 공통 카드 컴포넌트 - router/index.js의 각 /:id 상세 페이지에서 사용
+// BoardDetail.vue, NoticeDetail.vue, ArchiveDetail.vue, TeamNoticeDetail.vue 등에서 사용
 export default {
   name: 'PostDetailCard',
+  // FileList: 첨부파일 다운로드/삭제 UI 제공
   components: { FileList },
   props: {
+    // 표시할 게시글 데이터 객체 (title, content, authorName, createdAt, views, files 포함)
     post: { type: Object, required: true },
+    // 수정 버튼 표시 여부 (작성자 본인 또는 관리자일 때 true)
     canEdit: { type: Boolean, default: false },
+    // 삭제 버튼 표시 여부 및 FileList의 파일 삭제 버튼 활성화 여부
     canDelete: { type: Boolean, default: false },
+    // 수정 버튼 클릭 시 이동할 라우트 경로 (예: /board/edit/1)
     editRoute: { type: String, required: true },
+    // 목록으로 버튼 클릭 시 이동할 라우트 경로 (예: /board)
     backRoute: { type: String, required: true }
   },
+  // delete: 삭제 버튼 클릭 시 부모에게 emit / file-deleted: 첨부파일 삭제 시 부모에게 emit
   emits: ['delete', 'file-deleted'],
+  // 컴포넌트 마운트 후 DOM 렌더링 완료 시점에 코드 블록 구문 강조 적용
   mounted() { this.$nextTick(() => hljs.highlightAll()) },
+  // 게시글 내용이 동적으로 변경될 때마다 구문 강조 재적용 (비동기 데이터 로드 후 대응)
   updated() { this.$nextTick(() => hljs.highlightAll()) }
 }
 </script>
@@ -74,4 +87,5 @@ export default {
 .tiptap-display pre { background: #f4f4f4; border-radius: 4px; padding: 12px; overflow-x: auto; margin: 8px 0; }
 .tiptap-display pre code.hljs { background: #f4f4f4; border-radius: 4px; font-size: 13px; padding: 0; }
 .tiptap-display img { max-width: 100%; height: auto; border-radius: 4px; }
+.tiptap-display iframe { max-width: 100%; border-radius: 6px; display: block; margin: 8px 0; }
 </style>

@@ -61,7 +61,9 @@
 
 <script>
 import axios from 'axios'
+// 공통 페이지 헤더 컴포넌트 (PageHeader.vue)
 import PageHeader from '../common/PageHeader.vue'
+// Tiptap 리치텍스트 에디터 컴포넌트 (TiptapEditor.vue) - 관리자 답변 입력에 사용
 import TiptapEditor from '../common/TiptapEditor.vue'
 
 export default {
@@ -69,37 +71,53 @@ export default {
   components: { PageHeader, TiptapEditor },
   data() {
     return {
+      // 조회된 FAQ 상세 데이터 (질문, 답변, 작성자 정보 포함)
       faq: null,
+      // 관리자가 입력하는 답변 내용 (TiptapEditor v-model)
       answerContent: '',
+      // 답변 저장 중 여부 (중복 제출 방지)
       answerSubmitting: false,
+      // 답변 저장 오류 메시지
       answerError: ''
     }
   },
   computed: {
+    // 현재 로그인한 사용자 ID
     userId() { return localStorage.getItem('userId') || '' },
+    // 현재 사용자의 관리자 레벨
     adminLevel() { return parseInt(localStorage.getItem('adminLevel') || '0') },
+    // 관리자 여부 (adminLevel 1 이상이면 답변 등록/수정 가능)
     isAdmin() { return this.adminLevel >= 1 },
+    // 수정 권한: 작성자 본인만 가능
     canEdit() {
       return this.faq && this.faq.authorId === this.userId
     },
+    // 삭제 권한: 작성자 본인 또는 관리자
     canDelete() {
       return this.faq && (this.faq.authorId === this.userId || this.isAdmin)
     }
   },
+  // 컴포넌트 마운트 시 FAQ 상세 조회
   mounted() {
     this.fetchFaq()
   },
   methods: {
+    // GET /api/faq/:id 호출 → FaqController.java
+    // URL 파라미터의 id로 FAQ 상세(질문+답변) 조회, 기존 답변을 에디터에 로드
     async fetchFaq() {
       try {
         const res = await axios.get(`/api/faq/${this.$route.params.id}`)
         this.faq = res.data
+        // 기존 답변이 있으면 에디터 초기값으로 설정
         this.answerContent = this.faq.answer || ''
       } catch (e) {
         console.error('FAQ 조회 실패:', e)
       }
     },
+    // PUT /api/faq/:id/answer 호출 → FaqController.java
+    // 관리자가 답변을 등록하거나 수정, 저장 후 FAQ 재조회
     async submitAnswer() {
+      // 빈 답변 제출 방지 (Tiptap 빈 상태는 '<p></p>')
       if (!this.answerContent || this.answerContent === '<p></p>') {
         this.answerError = '답변 내용을 입력하세요.'
         return
@@ -107,11 +125,13 @@ export default {
       this.answerSubmitting = true
       this.answerError = ''
       try {
+        // 답변 작성자 이름(username) 로컬스토리지에서 읽기
         const username = localStorage.getItem('username') || this.userId
         await axios.put(`/api/faq/${this.faq.id}/answer`, {
           answer: this.answerContent,
           answeredBy: username
         }, { params: { requesterId: this.userId } })
+        // 저장 후 FAQ 데이터 재조회 (답변 반영)
         await this.fetchFaq()
       } catch (e) {
         this.answerError = e.response?.data?.message || '답변 저장 중 오류가 발생했습니다.'
@@ -119,6 +139,8 @@ export default {
         this.answerSubmitting = false
       }
     },
+    // DELETE /api/faq/:id 호출 → FaqController.java
+    // 삭제 확인 후 FAQ 삭제, 성공 시 FAQ 목록으로 이동
     async confirmDelete() {
       if (!confirm('질문을 삭제하시겠습니까?')) return
       try {
@@ -130,6 +152,7 @@ export default {
         alert(e.response?.data?.message || '삭제 중 오류가 발생했습니다.')
       }
     },
+    // 날짜 문자열에서 'YYYY-MM-DD' 형식만 추출
     formatDate(dateStr) {
       if (!dateStr) return '-'
       return dateStr.substring(0, 10)

@@ -37,27 +37,35 @@
 <script>
 export default {
   name: 'Home',
+  // API 호출 없음 - 모든 데이터는 로컬스토리지에서 읽음 (로그인 시 Login.vue에서 저장)
   computed: {
+    // 로그인한 사용자 이름 (로컬스토리지의 'username')
     username() {
       return localStorage.getItem('username') || ''
     },
+    // 로그인한 사용자 직급 (로컬스토리지의 'position')
     position() {
       return localStorage.getItem('position') || ''
     },
+    // 관리자 레벨 (0: 일반, 1: 관리자, 2: 슈퍼 관리자)
     adminLevel() {
       return parseInt(localStorage.getItem('adminLevel') || '0')
     },
+    // 일반 관리자 이상 여부
     isAdmin() {
       return this.adminLevel >= 1
     },
+    // 팀장 여부 (로컬스토리지의 'isTeamLeader')
     isTeamLeader() {
       return localStorage.getItem('isTeamLeader') === 'true'
     },
+    // 인사 관리 메뉴 접근 권한: 관리자 또는 팀장만 표시
     canAccessHr() {
       return this.isAdmin || this.isTeamLeader
     }
   },
   methods: {
+    // 로그아웃: 로컬스토리지의 모든 인증 정보를 삭제하고 로그인 페이지로 이동
     logout() {
       localStorage.removeItem('loggedIn')
       localStorage.removeItem('userId')

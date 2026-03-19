@@ -76,6 +76,7 @@
 
 <script>
 import axios from 'axios'
+// 공통 페이지 헤더 컴포넌트 (PageHeader.vue)
 import PageHeader from './common/PageHeader.vue'
 
 export default {
@@ -83,28 +84,41 @@ export default {
   components: { PageHeader },
   data() {
     return {
+      // 현재 로그인한 사용자 ID (API 호출 파라미터로 사용)
       userId: localStorage.getItem('userId') || '',
+      // 신청된 휴가 목록
       vacations: [],
+      // 잔여 연차 일수 (배지에 표시)
       remainingVacation: 0,
+      // 휴가 신청 폼 데이터
       form: {
+        // 휴가 유형: 연차/반차(오전)/반차(오후)/병가/기타
         type: '연차',
+        // 휴가 시작일 (YYYY-MM-DD)
         startDate: '',
+        // 휴가 종료일 (반차는 시작일과 동일하게 자동 설정)
         endDate: '',
+        // 휴가 사유
         reason: ''
       },
+      // 유효성 검사 오류 메시지
       errorMsg: ''
     }
   },
   computed: {
+    // 반차 여부: 반차(오전) 또는 반차(오후) 선택 시 true (종료일 입력 비활성화)
     isHalfDay() {
       return this.form.type === '반차(오전)' || this.form.type === '반차(오후)'
     }
   },
+  // 컴포넌트 마운트 시 휴가 목록과 잔여 연차 동시 조회
   mounted() {
     this.fetchVacations()
     this.fetchRemaining()
   },
   methods: {
+    // GET /api/vacation/remaining 호출 → VacationController.java
+    // 현재 사용자의 잔여 연차 일수 조회
     async fetchRemaining() {
       try {
         const res = await axios.get('http://localhost:8090/api/vacation/remaining', {
@@ -115,6 +129,8 @@ export default {
         console.error('잔여 연차 조회 실패:', e)
       }
     },
+    // GET /api/vacation 호출 → VacationController.java
+    // 현재 사용자의 전체 휴가 신청 내역 조회
     async fetchVacations() {
       try {
         const res = await axios.get('http://localhost:8090/api/vacation', {
@@ -125,16 +141,22 @@ export default {
         console.error('휴가 목록 조회 실패:', e)
       }
     },
+    // 휴가 유형 변경 이벤트 핸들러
+    // 반차 선택 시 종료일을 시작일과 동일하게 자동 설정
     onTypeChange() {
       if (this.isHalfDay && this.form.startDate) {
         this.form.endDate = this.form.startDate
       }
     },
+    // 시작일 변경 이벤트 핸들러
+    // 반차인 경우 종료일도 같은 날짜로 자동 동기화
     onStartDateChange() {
       if (this.isHalfDay) {
         this.form.endDate = this.form.startDate
       }
     },
+    // 테이블에 표시할 차감 일수 계산
+    // 반차: 0.5일, 연차: (종료일-시작일+1)일, 기타: 0일
     calcDeduct(type, startDate, endDate) {
       if (type === '반차(오전)' || type === '반차(오후)') return 0.5
       if (type === '연차' && startDate && endDate) {
@@ -144,12 +166,16 @@ export default {
       }
       return 0
     },
+    // POST /api/vacation 호출 → VacationController.java
+    // 유효성 검사 후 휴가 신청, 성공 시 폼 초기화 및 목록/잔여연차 재조회
     async submit() {
       this.errorMsg = ''
+      // 시작일/종료일 필수 입력 검사
       if (!this.form.startDate || !this.form.endDate) {
         this.errorMsg = '시작일과 종료일을 입력하세요.'
         return
       }
+      // 날짜 순서 유효성 검사
       if (this.form.startDate > this.form.endDate) {
         this.errorMsg = '종료일이 시작일보다 빠를 수 없습니다.'
         return
@@ -162,16 +188,20 @@ export default {
           endDate: this.form.endDate,
           reason: this.form.reason
         })
+        // 신청 완료 후 폼 초기화
         this.form.startDate = ''
         this.form.endDate = ''
         this.form.reason = ''
         this.form.type = '연차'
+        // 목록과 잔여 연차 재조회 (연차 차감 반영)
         await this.fetchVacations()
         await this.fetchRemaining()
       } catch (e) {
         this.errorMsg = e.response?.data?.message || '휴가 신청에 실패했습니다.'
       }
     },
+    // DELETE /api/vacation/:id 호출 → VacationController.java
+    // 취소 확인 후 휴가 삭제, 성공 시 목록과 잔여 연차 재조회 (연차 복구 반영)
     async deleteVacation(id) {
       if (!confirm('휴가를 취소하시겠습니까?')) return
       try {

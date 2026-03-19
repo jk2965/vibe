@@ -1,27 +1,54 @@
 package com.vibe.model;
 
+/**
+ * FAQ(자주 묻는 질문) 게시글 정보를 담는 Value Object 클래스.
+ * FaqMapper.java, FaqService.java에서 사용되며,
+ * 관리자(UserVO.java의 isAdmin=1)만 작성·수정·삭제 가능.
+ * FAQ는 첨부 파일 및 댓글 기능 없이 단순 Q&A 형태로 운영됨.
+ */
 public class FaqVO {
 
+    /** FAQ 게시글 고유 식별자 */
     private String id;
+    /** FAQ 질문 제목 */
     private String title;
+    /** FAQ 답변 내용 (HTML 형식, Tiptap 에디터 출력) */
     private String content;
+    /** 작성자 사용자 ID (UserVO.java의 id 참조) */
     private String authorId;
+    /** 작성자 이름 (표시용) */
     private String authorName;
+    /** 게시글 작성 일시 (문자열 형식) */
     private String createdAt;
+    /** 조회수 */
     private Integer views;
 
+    /** id 필드 반환 */
     public String getId() { return id; }
+    /** id 필드 설정 */
     public void setId(String id) { this.id = id; }
+    /** title 필드 반환 */
     public String getTitle() { return title; }
+    /** title 필드 설정 */
     public void setTitle(String title) { this.title = title; }
+    /** content 필드 반환 */
     public String getContent() { return content; }
+    /** content 필드 설정 */
     public void setContent(String content) { this.content = content; }
+    /** authorId 필드 반환 */
     public String getAuthorId() { return authorId; }
+    /** authorId 필드 설정 */
     public void setAuthorId(String authorId) { this.authorId = authorId; }
+    /** authorName 필드 반환 */
     public String getAuthorName() { return authorName; }
+    /** authorName 필드 설정 */
     public void setAuthorName(String authorName) { this.authorName = authorName; }
+    /** createdAt 필드 반환 */
     public String getCreatedAt() { return createdAt; }
+    /** createdAt 필드 설정 */
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    /** views 필드 반환 */
     public Integer getViews() { return views; }
+    /** views 필드 설정 */
     public void setViews(Integer views) { this.views = views; }
 }

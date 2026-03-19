@@ -64,33 +64,50 @@
 
 <script>
 import axios from 'axios'
+// 공통 페이지 헤더 컴포넌트 (PageHeader.vue)
 import PageHeader from '../common/PageHeader.vue'
 
 export default {
   name: 'TeamArchive',
   components: { PageHeader },
   data() {
+    // 로컬스토리지에서 현재 로그인 사용자의 권한 정보 읽기
     const adminLevel = parseInt(localStorage.getItem('adminLevel') || '0')
+    // 현재 사용자가 소속된 팀 이름
     const userTeam = localStorage.getItem('team') || ''
+    // 팀장 여부 (localStorage의 'isTeamLeader' 값)
     const isTeamLeader = localStorage.getItem('isTeamLeader') === 'true'
+    // 슈퍼 관리자 여부 (adminLevel 2 이상)
     const isSuperAdmin = adminLevel >= 2
     return {
+      // 자료실 게시글 목록
       posts: [],
+      // 현재 페이지 번호
       pageNum: 1,
+      // 전체 페이지 수
       totalPages: 1,
+      // 전체 게시글 수 (번호 역순 계산용)
       totalCount: 0,
+      // 현재 선택된 팀 (슈퍼 관리자는 '1팀' 기본, 일반 사용자는 본인 팀)
       selectedTeam: isSuperAdmin ? '1팀' : userTeam,
+      // 일반 관리자 여부 (adminLevel 1 이상)
       isAdmin: adminLevel >= 1,
+      // 슈퍼 관리자 여부
       isSuperAdmin,
+      // 팀장 여부
       isTeamLeader,
+      // 사용자 소속 팀명
       userTeam,
+      // 오류 메시지
       errorMsg: ''
     }
   },
   computed: {
+    // 글쓰기 권한: 슈퍼 관리자, 일반 관리자, 팀장만 가능
     canWrite() {
       return this.isSuperAdmin || this.isAdmin || this.isTeamLeader
     },
+    // 페이지네이션: 현재 페이지 기준으로 5개씩 표시할 페이지 번호 배열 계산
     pageRange() {
       const start = Math.floor((this.pageNum - 1) / 5) * 5 + 1
       const end = Math.min(start + 4, this.totalPages)
@@ -99,10 +116,12 @@ export default {
       return range
     }
   },
+  // 컴포넌트 마운트 시 선택된 팀이 있으면 게시글 목록 조회
   mounted() {
     if (this.selectedTeam) this.fetchPosts()
   },
   methods: {
+    // 팀 선택 변경 시 페이지 초기화 후 재조회
     onTeamChange() {
       this.pageNum = 1
       this.posts = []
@@ -110,6 +129,8 @@ export default {
       this.totalPages = 1
       if (this.selectedTeam) this.fetchPosts()
     },
+    // GET /api/team-archive 호출 → TeamArchiveController.java
+    // team, requesterId, pageNum 파라미터로 팀별 자료실 목록 페이징 조회
     async fetchPosts() {
       this.errorMsg = ''
       try {
@@ -120,6 +141,7 @@ export default {
             pageNum: this.pageNum
           }
         })
+        // 게시글 목록, 전체 페이지 수, 전체 게시글 수 저장
         this.posts = res.data.list
         this.totalPages = res.data.pages
         this.totalCount = res.data.total
@@ -127,14 +149,17 @@ export default {
         this.errorMsg = e.response?.data?.message || '자료실 목록 조회 실패'
       }
     },
+    // 페이지 번호 클릭 시 해당 페이지로 이동하고 목록 재조회
     changePage(p) {
       if (p < 1 || p > this.totalPages) return
       this.pageNum = p
       this.fetchPosts()
     },
+    // 게시글 행 클릭 시 상세 페이지(/team-archive/:id)로 이동
     goDetail(id) {
       this.$router.push(`/team-archive/${id}`)
     },
+    // 날짜 문자열에서 'YYYY-MM-DD' 형식만 추출
     formatDate(dateStr) {
       if (!dateStr) return '-'
       return dateStr.substring(0, 10)
