@@ -51,4 +51,13 @@
         UPDATE vibe.team_archive SET is_required = #{isRequired} WHERE id = #{id}
     </update>
 
+    <select id="findByAuthor" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
+               (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
+        FROM vibe.team_archive a
+        WHERE a.author_id = #{authorId}
+        ORDER BY a.created_at DESC
+    </select>
+
 </mapper>

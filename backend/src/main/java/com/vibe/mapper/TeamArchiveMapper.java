@@ -26,4 +26,6 @@ public interface TeamArchiveMapper {
     void setRequired(@Param("id") String id, @Param("isRequired") int isRequired);
     // 필독 팀 자료실 게시글 목록을 조회
     List<TeamArchiveVO> findRequired();
+    // 특정 작성자의 팀 자료실 게시글 목록을 조회
+    List<TeamArchiveVO> findByAuthor(String authorId);
 }

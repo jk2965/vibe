@@ -26,4 +26,6 @@ public interface NoticeMapper {
     void setRequired(@Param("id") String id, @Param("isRequired") int isRequired);
     // 필독 공지사항 목록을 조회
     List<NoticeVO> findRequired();
+    // 특정 작성자의 공지사항 목록을 조회
+    List<NoticeVO> findByAuthor(String authorId);
 }

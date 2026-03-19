@@ -26,4 +26,6 @@ public interface ArchiveMapper {
     void setRequired(@Param("id") String id, @Param("isRequired") int isRequired);
     // 필독 자료실 게시글 목록을 조회
     List<ArchiveVO> findRequired();
+    // 특정 작성자의 자료실 게시글 목록을 조회
+    List<ArchiveVO> findByAuthor(String authorId);
 }

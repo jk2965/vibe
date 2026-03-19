@@ -48,4 +48,12 @@
         UPDATE vibe.board SET is_required = #{isRequired} WHERE id = #{id}
     </update>
 
+    <select id="findByAuthor" parameterType="String" resultType="com.vibe.model.BoardVO">
+        SELECT b.id, b.title, b.author_id, b.author_name, b.created_at, b.views, b.is_required,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = b.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.board b
+        WHERE b.author_id = #{authorId}
+        ORDER BY b.created_at DESC
+    </select>
+
 </mapper>

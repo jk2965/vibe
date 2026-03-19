@@ -16,6 +16,10 @@
         <span class="item-icon">📌</span>
         <span class="item-label">필독 게시글</span>
       </router-link>
+      <router-link to="/my-posts" class="sidebar-item my-posts-item" :class="{ active: isActive('/my-posts') }">
+        <span class="item-icon">✍️</span>
+        <span class="item-label">내 게시글</span>
+      </router-link>
       <router-link to="/notice" class="sidebar-item" :class="{ active: isActive('/notice') }">
         <span class="item-icon">📢</span>
         <span class="item-label">전체 공지사항</span>
@@ -229,6 +233,8 @@ export default {
 }
 .required-item.active { background: #fce4ec; color: #c62828; border-left-color: #c62828; }
 .required-item:not(.active):hover { background: #fce4ec30; }
+.my-posts-item.active { background: #e8f5e9; color: #2e7d32; border-left-color: #2e7d32; }
+.my-posts-item:not(.active):hover { background: #e8f5e930; }
 .item-icon { font-size: 16px; flex-shrink: 0; }
 .item-label { font-size: 13.5px; }
 

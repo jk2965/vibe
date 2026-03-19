@@ -56,4 +56,12 @@
         UPDATE vibe.team_notice SET is_required = #{isRequired} WHERE id = #{id}
     </update>
 
+    <select id="findByAuthor" parameterType="String" resultType="com.vibe.model.TeamNoticeVO">
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team, n.is_required,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.team_notice n
+        WHERE n.author_id = #{authorId}
+        ORDER BY n.created_at DESC
+    </select>
+
 </mapper>

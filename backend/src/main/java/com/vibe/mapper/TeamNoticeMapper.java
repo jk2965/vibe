@@ -28,4 +28,6 @@ public interface TeamNoticeMapper {
     void setRequired(@Param("id") String id, @Param("isRequired") int isRequired);
     // 필독 팀 공지사항 목록을 조회
     List<TeamNoticeVO> findRequired();
+    // 특정 작성자의 팀 공지사항 목록을 조회
+    List<TeamNoticeVO> findByAuthor(String authorId);
 }

@@ -26,4 +26,6 @@ public interface BoardMapper {
     void setRequired(@Param("id") String id, @Param("isRequired") int isRequired);
     // 필독 게시글 목록을 조회
     List<BoardVO> findRequired();
+    // 특정 작성자의 게시글 목록을 조회
+    List<BoardVO> findByAuthor(String authorId);
 }
