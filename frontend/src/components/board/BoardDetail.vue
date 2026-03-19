@@ -47,8 +47,7 @@ export default {
     canEdit() { return this.post && this.post.authorId === this.userId },
     // 삭제 가능 여부: 작성자 본인 또는 관리자인 경우 true
     canDelete() { return this.post && (this.post.authorId === this.userId || this.isAdmin) },
-    // 필독 설정 권한: 관리자(adminLevel >= 1) 또는 팀장
-    canSetRequired() { return this.adminLevel >= 1 || this.isTeamLeader }
+    canSetRequired() { return true }
   },
   // 컴포넌트 마운트 시 URL 파라미터의 게시글 ID로 상세 조회 시작
   mounted() {

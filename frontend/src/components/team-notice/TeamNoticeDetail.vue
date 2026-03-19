@@ -54,8 +54,7 @@ export default {
     canEdit() { return this.post && this.post.authorId === this.userId },
     // 삭제 권한: 본인 작성이거나 관리자(레벨 1 이상)인 경우 허용
     canDelete() { return this.post && (this.post.authorId === this.userId || this.adminLevel >= 1) },
-    // 필독 설정 권한: 관리자(adminLevel >= 1) 또는 팀장
-    canSetRequired() { return this.adminLevel >= 1 || this.isTeamLeader }
+    canSetRequired() { return true }
   },
   // 컴포넌트 마운트 시 팀 공지사항 상세 데이터 로드
   mounted() {

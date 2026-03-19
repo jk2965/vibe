@@ -4,7 +4,7 @@
     <PostWriteForm
       :submitting="submitting"
       :errorMsg="errorMsg"
-      :showRequired="canSetRequired"
+      :showRequired="true"
       submitBtnColor="#1976d2"
       @submit="handleSubmit"
       @cancel="$router.push('/board')"

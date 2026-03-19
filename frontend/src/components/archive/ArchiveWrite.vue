@@ -4,7 +4,7 @@
     <PostWriteForm
       :submitting="submitting"
       :errorMsg="errorMsg"
-      :showRequired="canSetRequired"
+      :showRequired="true"
       submitBtnColor="#1565c0"
       @submit="handleSubmit"
       @cancel="$router.push('/archive')"

@@ -176,12 +176,6 @@ public class TeamNoticeController {
     public ResponseEntity<?> setRequired(@PathVariable String id,
                                          @RequestParam String requesterId,
                                          @RequestBody Map<String, Integer> body) {
-        // UserService.java의 isAdmin(), isTeamLeader()로 권한 확인
-        boolean isAdmin = userService.isAdmin(requesterId);
-        boolean isTeamLeader = userService.isTeamLeader(requesterId);
-        if (!isAdmin && !isTeamLeader) {
-            return ResponseEntity.status(403).body(Map.of("message", "권한이 없습니다."));
-        }
         int value = body.getOrDefault("isRequired", 0);
         // TeamNoticeService.java의 setRequired()로 필독 여부 업데이트
         teamNoticeService.setRequired(id, value);

@@ -4,7 +4,7 @@
     <PostWriteForm
       :submitting="submitting"
       :errorMsg="errorMsg"
-      :showRequired="canSetRequired"
+      :showRequired="true"
       submitBtnColor="#2e7d32"
       @submit="handleSubmit"
       @cancel="$router.push('/team-archive')"
