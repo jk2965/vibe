@@ -75,11 +75,12 @@ public class TeamNoticeService {
      * 팀 공지사항 수정: 제목과 내용만 업데이트.
      * TeamNoticeMapper.java의 update()로 TEAM_NOTICE 테이블 수정.
      */
-    public void update(String id, String title, String content) {
+    public void update(String id, String title, String content, String tags) {
         TeamNoticeVO notice = new TeamNoticeVO();
         notice.setId(id);
         notice.setTitle(title);
         notice.setContent(content);
+        notice.setTags(tags);
         mapper.update(notice);
     }
 

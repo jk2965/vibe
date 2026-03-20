@@ -17,6 +17,10 @@
         <span>조회 {{ post.views }}</span>
       </div>
     </div>
+    <!-- 태그 표시 -->
+    <div v-if="postTags.length > 0" class="tag-list">
+      <span v-for="tag in postTags" :key="tag" class="tag-chip">{{ tag }}</span>
+    </div>
     <div class="post-content tiptap-display" v-html="post.content"></div>
     <FileList
       :files="post.files || []"
@@ -61,6 +65,12 @@ export default {
     // 필독 설정/해제 버튼 표시 여부 (관리자 또는 팀장)
     canSetRequired: { type: Boolean, default: false }
   },
+  computed: {
+    postTags() {
+      if (!this.post.tags) return []
+      return this.post.tags.split(',').filter(t => t.trim())
+    }
+  },
   // delete: 삭제 버튼 클릭 시 부모에게 emit / file-deleted: 첨부파일 삭제 시 부모에게 emit / toggleRequired: 필독 설정/해제 emit
   emits: ['delete', 'file-deleted', 'toggleRequired'],
   // 컴포넌트 마운트 후 DOM 렌더링 완료 시점에 코드 블록 구문 강조 적용
@@ -90,6 +100,8 @@ export default {
 .btn-edit:hover { background: #e65100; }
 .btn-delete { padding: 10px 24px; background: #e53935; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
 .btn-delete:hover { background: #c62828; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.tag-chip { background: #e3f2fd; color: #1565c0; border-radius: 16px; padding: 3px 12px; font-size: 13px; }
 </style>
 
 <style>

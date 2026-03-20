@@ -5,6 +5,7 @@
       :initialTitle="form.title"
       :initialContent="form.content"
       :existingFiles="existingFiles"
+      :initialTags="form.tags"
       :submitting="submitting"
       :errorMsg="errorMsg"
       submitBtnColor="#2e7d32"
@@ -29,7 +30,7 @@ export default {
       // URL 파라미터에서 수정할 게시글 ID 추출
       postId: this.$route.params.id,
       // 수정 폼 데이터 (기존 제목/내용을 loadPost에서 채움)
-      form: { title: '', content: '' },
+      form: { title: '', content: '', tags: '' },
       // 기존에 업로드된 파일 목록 (PostEditForm에 초기값으로 전달)
       existingFiles: [],
       // 폼 제출 중 여부 (중복 제출 방지)
@@ -53,6 +54,7 @@ export default {
         // 기존 제목과 내용을 폼에 설정
         this.form.title = res.data.title
         this.form.content = res.data.content || ''
+        this.form.tags = res.data.tags || ''
         // 기존 첨부 파일 목록 설정
         this.existingFiles = res.data.files || []
       } catch (e) {
@@ -63,13 +65,13 @@ export default {
     // PostEditForm에서 submit 이벤트 발생 시 호출
     // PUT /api/team-archive/:id 호출 → TeamArchiveController.java (게시글 수정)
     // POST /api/team-archive/:id/files 호출 → TeamArchiveController.java (신규 파일 업로드)
-    async handleSubmit({ title, content, pendingFiles }) {
+    async handleSubmit({ title, content, pendingFiles, tags }) {
       this.submitting = true
       this.errorMsg = ''
       try {
         const userId = localStorage.getItem('userId')
         // 게시글 본문(제목, 내용) 수정 API 호출
-        await axios.put(`http://localhost:8090/api/team-archive/${this.postId}`, { title, content }, { params: { requesterId: userId } })
+        await axios.put(`http://localhost:8090/api/team-archive/${this.postId}`, { title, content, tags }, { params: { requesterId: userId } })
         // 새로 추가된 파일 개별 업로드 (FormData 사용)
         for (const file of pendingFiles) {
           const fd = new FormData()

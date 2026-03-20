@@ -3,7 +3,7 @@
 <mapper namespace="com.vibe.mapper.TeamArchiveMapper">
 
     <select id="findByTeam" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
-        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required,
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
         FROM vibe.team_archive a
@@ -12,21 +12,21 @@
     </select>
 
     <select id="findById" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
-        SELECT id, title, content, author_id, author_name, created_at, views, team, is_required
+        SELECT id, title, content, author_id, author_name, created_at, views, team, is_required, tags
         FROM vibe.team_archive
         WHERE id = #{id}
     </select>
 
     <insert id="insert" parameterType="com.vibe.model.TeamArchiveVO">
-        INSERT INTO vibe.team_archive (id, title, content, author_id, author_name, created_at, views, team, is_required)
+        INSERT INTO vibe.team_archive (id, title, content, author_id, author_name, created_at, views, team, is_required, tags)
         VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
-                #{createdAt,jdbcType=VARCHAR}, 0, #{team,jdbcType=VARCHAR}, 0)
+                #{createdAt,jdbcType=VARCHAR}, 0, #{team,jdbcType=VARCHAR}, 0, #{tags,jdbcType=VARCHAR})
     </insert>
 
     <update id="update" parameterType="com.vibe.model.TeamArchiveVO">
         UPDATE vibe.team_archive
-        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}
+        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}, tags = #{tags,jdbcType=VARCHAR}
         WHERE id = #{id}
     </update>
 
@@ -39,7 +39,7 @@
     </delete>
 
     <select id="findRequired" resultType="com.vibe.model.TeamArchiveVO">
-        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required,
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
         FROM vibe.team_archive a
@@ -52,7 +52,7 @@
     </update>
 
     <select id="findByAuthor" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
-        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required,
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
         FROM vibe.team_archive a

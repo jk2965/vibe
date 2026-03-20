@@ -31,6 +31,8 @@ public class TeamNoticeVO {
     private String team;
     /** 필독 여부 (0: 일반, 1: 필독) */
     private Integer isRequired;
+    /** 검색용 태그 목록 (쉼표 구분 문자열, 최대 10개) */
+    private String tags;
     /** 첨부 파일 목록 (ArchiveFileVO.java 참조, ArchiveFileMapper.java에서 조회) */
     private List<ArchiveFileVO> files;
 
@@ -74,6 +76,10 @@ public class TeamNoticeVO {
     public Integer getIsRequired() { return isRequired; }
     /** isRequired 필드 설정 */
     public void setIsRequired(Integer isRequired) { this.isRequired = isRequired; }
+    /** tags 필드 반환 */
+    public String getTags() { return tags; }
+    /** tags 필드 설정 */
+    public void setTags(String tags) { this.tags = tags; }
     /** files 필드 반환 */
     public List<ArchiveFileVO> getFiles() { return files; }
     /** files 필드 설정 */

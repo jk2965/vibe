@@ -76,11 +76,12 @@ public class TeamArchiveService {
      * 팀 자료실 게시글 수정: 제목과 내용만 업데이트.
      * TeamArchiveMapper.java의 update()로 TEAM_ARCHIVE 테이블 수정.
      */
-    public void update(String id, String title, String content) {
+    public void update(String id, String title, String content, String tags) {
         TeamArchiveVO archive = new TeamArchiveVO();
         archive.setId(id);
         archive.setTitle(title);
         archive.setContent(content);
+        archive.setTags(tags);
         mapper.update(archive);
     }
 

@@ -145,8 +145,9 @@ public class TeamArchiveController {
         String title = body.get("title");
         String content = body.get("content");
         if (title == null || title.isBlank()) return ResponseEntity.badRequest().body(Map.of("message", "제목을 입력하세요."));
-        // TeamArchiveService.java의 update()로 제목/내용 업데이트
-        teamArchiveService.update(id, title, content);
+        String tags = body.getOrDefault("tags", "");
+        // TeamArchiveService.java의 update()로 제목/내용/태그 업데이트
+        teamArchiveService.update(id, title, content, tags);
         return ResponseEntity.ok(Map.of("success", true));
     }
 

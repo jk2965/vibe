@@ -5,6 +5,7 @@
       :initialTitle="form.title"
       :initialContent="form.content"
       :existingFiles="existingFiles"
+      :initialTags="form.tags"
       :submitting="submitting"
       :errorMsg="errorMsg"
       submitBtnColor="#5c6bc0"
@@ -30,7 +31,7 @@ export default {
       // URL 파라미터에서 수정할 게시글 ID 추출
       postId: this.$route.params.id,
       // 수정 폼 데이터 (제목, 내용)
-      form: { title: '', content: '' },
+      form: { title: '', content: '', tags: '' },
       // 기존에 등록된 첨부파일 목록 (파일 삭제 기능에 사용)
       existingFiles: [],
       // 폼 제출 중 여부 (중복 제출 방지용)
@@ -58,6 +59,7 @@ export default {
         // 기존 제목, 내용, 첨부파일 목록을 폼에 세팅
         this.form.title = res.data.title
         this.form.content = res.data.content || ''
+        this.form.tags = res.data.tags || ''
         this.existingFiles = res.data.files || []
       } catch (e) {
         // 조회 실패(또는 403 권한 없음) 시 팀 공지사항 목록으로 이동 → TeamNotice.vue
@@ -65,14 +67,14 @@ export default {
       }
     },
     // PostEditForm.vue에서 submit 이벤트 발생 시 호출되는 팀 공지사항 수정 핸들러
-    async handleSubmit({ title, content, pendingFiles }) {
+    async handleSubmit({ title, content, pendingFiles, tags }) {
       // 제출 시작: 중복 제출 방지 플래그 설정
       this.submitting = true
       this.errorMsg = ''
       try {
         const userId = localStorage.getItem('userId')
         // PUT /api/team-notice/:id 호출 → TeamNoticeController.java (팀 공지사항 수정)
-        await axios.put(`http://localhost:8090/api/team-notice/${this.postId}`, { title, content }, { params: { requesterId: userId } })
+        await axios.put(`http://localhost:8090/api/team-notice/${this.postId}`, { title, content, tags }, { params: { requesterId: userId } })
         // 새로 추가된 첨부파일이 있는 경우 순서대로 업로드 처리
         for (const file of pendingFiles) {
           const fd = new FormData()

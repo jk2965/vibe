@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     // PostWriteForm.vue에서 submit 이벤트 발생 시 호출되는 팀 공지사항 등록 핸들러
-    async handleSubmit({ title, content, pendingFiles, isRequired }) {
+    async handleSubmit({ title, content, pendingFiles, isRequired, tags }) {
       // 제출 시작: 중복 제출 방지 플래그 설정
       this.submitting = true
       this.errorMsg = ''
@@ -51,7 +51,7 @@ export default {
         const userId = localStorage.getItem('userId')
         // POST /api/team-notice 호출 → TeamNoticeController.java (팀 공지사항 등록, 팀 정보 포함)
         const res = await axios.post('http://localhost:8090/api/team-notice', {
-          title, content, isRequired,
+          title, content, isRequired, tags,
           authorId: userId,
           authorName: localStorage.getItem('username'),
           team: this.team

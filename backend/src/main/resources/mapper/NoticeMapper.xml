@@ -3,28 +3,28 @@
 <mapper namespace="com.vibe.mapper.NoticeMapper">
 
     <select id="findAll" resultType="com.vibe.model.NoticeVO">
-        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required,
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required, n.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
         FROM vibe.notice n
         ORDER BY n.is_required DESC, n.created_at DESC
     </select>
 
     <select id="findById" parameterType="String" resultType="com.vibe.model.NoticeVO">
-        SELECT id, title, content, author_id, author_name, created_at, views, is_required
+        SELECT id, title, content, author_id, author_name, created_at, views, is_required, tags
         FROM vibe.notice
         WHERE id = #{id}
     </select>
 
     <insert id="insert" parameterType="com.vibe.model.NoticeVO">
-        INSERT INTO vibe.notice (id, title, content, author_id, author_name, created_at, views, is_required)
+        INSERT INTO vibe.notice (id, title, content, author_id, author_name, created_at, views, is_required, tags)
         VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
-                #{createdAt,jdbcType=VARCHAR}, 0, #{isRequired,jdbcType=INTEGER})
+                #{createdAt,jdbcType=VARCHAR}, 0, #{isRequired,jdbcType=INTEGER}, #{tags,jdbcType=VARCHAR})
     </insert>
 
     <update id="update" parameterType="com.vibe.model.NoticeVO">
         UPDATE vibe.notice
-        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}
+        SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}, tags = #{tags,jdbcType=VARCHAR}
         WHERE id = #{id}
     </update>
 
@@ -37,7 +37,7 @@
     </delete>
 
     <select id="findRequired" resultType="com.vibe.model.NoticeVO">
-        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required,
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required, n.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
         FROM vibe.notice n
         WHERE n.is_required = 1
@@ -49,7 +49,7 @@
     </update>
 
     <select id="findByAuthor" parameterType="String" resultType="com.vibe.model.NoticeVO">
-        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required,
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required, n.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
         FROM vibe.notice n
         WHERE n.author_id = #{authorId}

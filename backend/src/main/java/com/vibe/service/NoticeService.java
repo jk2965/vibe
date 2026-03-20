@@ -74,11 +74,12 @@ public class NoticeService {
      * 공지사항 수정: 제목과 내용만 업데이트.
      * NoticeMapper.java의 update()로 NOTICE 테이블 수정.
      */
-    public void update(String id, String title, String content) {
+    public void update(String id, String title, String content, String tags) {
         NoticeVO notice = new NoticeVO();
         notice.setId(id);
         notice.setTitle(title);
         notice.setContent(content);
+        notice.setTags(tags);
         mapper.update(notice);
     }
 

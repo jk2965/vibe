@@ -9,6 +9,24 @@
       <TiptapEditor v-model="localContent" :imageUploadUrl="imageUploadUrl" />
     </div>
     <slot name="extra-fields"></slot>
+    <!-- 태그 입력: 엔터/쉼표로 태그 추가, 최대 10개 -->
+    <div class="form-group">
+      <label>태그 <span class="tag-hint">아래 태그는 최대 10개까지 지정할 수 있습니다.</span></label>
+      <div class="tag-input-wrap">
+        <span v-for="tag in localTags" :key="tag" class="tag-chip">
+          {{ tag }}<button type="button" @click="removeTag(tag)" class="tag-remove">×</button>
+        </span>
+        <input
+          v-if="localTags.length < 10"
+          v-model="tagInput"
+          type="text"
+          class="tag-text-input"
+          placeholder="태그 입력 후 Enter 또는 쉼표"
+          @keydown.enter.prevent="addTag"
+          @keydown="onTagKeydown"
+        />
+      </div>
+    </div>
     <!-- 필독 체크박스: showRequired=true이고 권한자(관리자/팀장)일 때만 표시 -->
     <div v-if="showRequired" class="form-group required-check-wrap">
       <label class="required-label">
@@ -72,6 +90,10 @@ export default {
       localFiles: [],
       // 필독 여부 체크박스 상태
       localIsRequired: false,
+      // 태그 목록 (최대 10개)
+      localTags: [],
+      // 태그 입력 중인 텍스트
+      tagInput: '',
       // 폼 유효성 검사 실패 시 표시할 로컬 에러 메시지
       localError: ''
     }
@@ -83,6 +105,19 @@ export default {
     }
   },
   methods: {
+    addTag() {
+      const tag = this.tagInput.trim().replace(/,$/, '')
+      if (tag && !this.localTags.includes(tag) && this.localTags.length < 10) {
+        this.localTags.push(tag)
+      }
+      this.tagInput = ''
+    },
+    onTagKeydown(e) {
+      if (e.key === ',') { e.preventDefault(); this.addTag() }
+    },
+    removeTag(tag) {
+      this.localTags = this.localTags.filter(t => t !== tag)
+    },
     // 등록 버튼 클릭 시 유효성 검사 후 부모에게 submit 이벤트 emit
     handleSubmit() {
       // 이전 에러 초기화
@@ -96,7 +131,8 @@ export default {
         title: this.localTitle.trim(),
         content: this.localContent,
         pendingFiles: this.localFiles,
-        isRequired: this.localIsRequired ? 1 : 0
+        isRequired: this.localIsRequired ? 1 : 0,
+        tags: this.localTags.join(',')
       })
     }
   }
@@ -118,4 +154,9 @@ export default {
 .required-check-wrap { margin-bottom: 16px; }
 .required-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; font-weight: bold; color: #c62828; }
 .required-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: #c62828; cursor: pointer; }
+.tag-hint { font-size: 12px; font-weight: normal; color: #888; margin-left: 8px; }
+.tag-input-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; min-height: 42px; align-items: center; }
+.tag-chip { display: inline-flex; align-items: center; background: #e3f2fd; color: #1565c0; border-radius: 16px; padding: 3px 10px; font-size: 13px; gap: 4px; }
+.tag-remove { background: none; border: none; color: #1565c0; cursor: pointer; font-size: 15px; padding: 0; line-height: 1; }
+.tag-text-input { border: none; outline: none; font-size: 14px; min-width: 160px; flex: 1; background: transparent; }
 </style>

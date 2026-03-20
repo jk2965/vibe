@@ -43,14 +43,14 @@ export default {
     // PostWriteForm에서 submit 이벤트 발생 시 호출
     // POST /api/team-archive 호출 → TeamArchiveController.java (게시글 등록)
     // POST /api/team-archive/:id/files 호출 → TeamArchiveController.java (파일 업로드, 복수)
-    async handleSubmit({ title, content, pendingFiles, isRequired }) {
+    async handleSubmit({ title, content, pendingFiles, isRequired, tags }) {
       this.submitting = true
       this.errorMsg = ''
       try {
         const userId = localStorage.getItem('userId')
         // 게시글 본문 등록 API 호출
         const res = await axios.post('http://localhost:8090/api/team-archive', {
-          title, content, isRequired,
+          title, content, isRequired, tags,
           authorId: userId,
           authorName: localStorage.getItem('username'),
           team: this.team

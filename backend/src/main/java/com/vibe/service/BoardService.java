@@ -74,11 +74,12 @@ public class BoardService {
      * 게시글 수정: 제목과 내용만 업데이트.
      * BoardMapper.java의 update()로 BOARD 테이블 수정.
      */
-    public void update(String id, String title, String content) {
+    public void update(String id, String title, String content, String tags) {
         BoardVO board = new BoardVO();
         board.setId(id);
         board.setTitle(title);
         board.setContent(content);
+        board.setTags(tags);
         mapper.update(board);
     }
 

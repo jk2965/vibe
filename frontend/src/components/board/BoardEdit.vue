@@ -5,6 +5,7 @@
       :initialTitle="form.title"
       :initialContent="form.content"
       :existingFiles="existingFiles"
+      :initialTags="form.tags"
       :submitting="submitting"
       :errorMsg="errorMsg"
       submitBtnColor="#1976d2"
@@ -28,7 +29,7 @@ export default {
   data() {
     return {
       postId: this.$route.params.id,        // URL 파라미터에서 수정할 게시글 ID 추출
-      form: { title: '', content: '' },     // 수정 폼 데이터 (서버에서 로드 후 채움)
+      form: { title: '', content: '', tags: '' },     // 수정 폼 데이터 (서버에서 로드 후 채움)
       existingFiles: [],                    // 기존 첨부 파일 목록 (PostEditForm.vue로 전달)
       submitting: false,                    // 제출 중 상태 플래그 (중복 제출 방지)
       errorMsg: ''                          // 수정 실패 시 사용자에게 표시할 오류 메시지
@@ -49,7 +50,8 @@ export default {
           return
         }
         this.form.title = res.data.title          // 기존 제목을 폼에 설정
-        this.form.content = res.data.content || '' // 기존 본문을 폼에 설정
+        this.form.content = res.data.content || ''
+        this.form.tags = res.data.tags || '' // 기존 본문을 폼에 설정
         this.existingFiles = res.data.files || []  // 기존 첨부 파일 목록 설정
       } catch (e) {
         // 게시글 조회 실패 시 목록 페이지로 이동
@@ -57,13 +59,13 @@ export default {
       }
     },
     // PostEditForm.vue에서 submit 이벤트 발생 시 호출 → 게시글 수정 및 신규 파일 업로드 처리
-    async handleSubmit({ title, content, pendingFiles }) {
+    async handleSubmit({ title, content, pendingFiles, tags }) {
       this.submitting = true   // 제출 시작: 버튼 비활성화
       this.errorMsg = ''       // 이전 오류 메시지 초기화
       try {
         const userId = localStorage.getItem('userId')  // 로컬스토리지에서 현재 사용자 ID 로드
         // PUT /api/board/:id → BoardController.java: 게시글 제목/본문 수정
-        await axios.put(`http://localhost:8090/api/board/${this.postId}`, { title, content }, { params: { requesterId: userId } })
+        await axios.put(`http://localhost:8090/api/board/${this.postId}`, { title, content, tags }, { params: { requesterId: userId } })
         // 새로 추가된 첨부 파일이 있는 경우 순차적으로 업로드
         for (const file of pendingFiles) {
           const fd = new FormData()

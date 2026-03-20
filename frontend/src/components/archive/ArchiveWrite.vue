@@ -38,14 +38,14 @@ export default {
   },
   methods: {
     // PostWriteForm.vue에서 submit 이벤트 발생 시 호출 → 자료 생성 및 파일 업로드 처리
-    async handleSubmit({ title, content, pendingFiles, isRequired }) {
+    async handleSubmit({ title, content, pendingFiles, isRequired, tags }) {
       this.submitting = true   // 제출 시작: 버튼 비활성화
       this.errorMsg = ''       // 이전 오류 메시지 초기화
       try {
         const userId = localStorage.getItem('userId')  // 로컬스토리지에서 현재 사용자 ID 로드
         // POST /api/archive → ArchiveController.java: 자료 신규 생성 (requesterId로 권한 검증)
         const res = await axios.post('http://localhost:8090/api/archive', {
-          title, content, isRequired,
+          title, content, isRequired, tags,
           authorId: userId,
           authorName: localStorage.getItem('username')  // 로컬스토리지에서 작성자명 로드
         }, { params: { requesterId: userId } })
