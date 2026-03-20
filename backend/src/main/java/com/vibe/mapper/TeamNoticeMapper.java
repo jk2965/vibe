@@ -30,4 +30,8 @@ public interface TeamNoticeMapper {
     List<TeamNoticeVO> findRequired();
     // 특정 작성자의 팀 공지사항 목록을 조회
     List<TeamNoticeVO> findByAuthor(String authorId);
+    // 제목에 keyword가 포함된 팀 공지사항 목록 조회 (검색 기능용)
+    List<TeamNoticeVO> searchByTitle(String keyword);
+    // tags 컬럼에 keyword가 포함된 팀 공지사항 목록 조회 (태그 검색 기능용)
+    List<TeamNoticeVO> searchByTag(String keyword);
 }

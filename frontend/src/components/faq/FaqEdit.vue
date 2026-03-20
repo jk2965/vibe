@@ -10,7 +10,7 @@
       :initialContent="initialContent"
       :submitting="submitting"
       :errorMsg="errorMsg"
-      submitBtnColor="#6a1b9a"
+      submitBtnColor="#1a73e8"
       @submit="handleSubmit"
       @cancel="$router.push('/faq')"
     />

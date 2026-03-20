@@ -68,7 +68,7 @@ export default {
     // TiptapEditor에 전달할 이미지 업로드 API URL
     imageUploadUrl: { type: String, default: '/api/archive/image' },
     // 등록 버튼의 배경색 (게시판 종류별로 색상 다르게 설정 가능)
-    submitBtnColor: { type: String, default: '#1976d2' },
+    submitBtnColor: { type: String, default: '#1a73e8' },
     // 파일 첨부 영역 표시 여부 (FAQ 등 파일 불필요한 게시판에서 false)
     showFiles: { type: Boolean, default: true },
     // 필독 체크박스 표시 여부 (관리자/팀장만 true로 전달)

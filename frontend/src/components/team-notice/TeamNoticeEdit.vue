@@ -8,7 +8,7 @@
       :initialTags="form.tags"
       :submitting="submitting"
       :errorMsg="errorMsg"
-      submitBtnColor="#5c6bc0"
+      submitBtnColor="#1a73e8"
       @submit="handleSubmit"
       @cancel="$router.push(`/team-notice/${postId}`)"
     />

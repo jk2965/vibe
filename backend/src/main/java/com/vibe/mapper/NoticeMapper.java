@@ -28,4 +28,8 @@ public interface NoticeMapper {
     List<NoticeVO> findRequired();
     // 특정 작성자의 공지사항 목록을 조회
     List<NoticeVO> findByAuthor(String authorId);
+    // 제목에 keyword가 포함된 공지사항 목록 조회 (검색 기능용)
+    List<NoticeVO> searchByTitle(String keyword);
+    // tags 컬럼에 keyword가 포함된 공지사항 목록 조회 (태그 검색 기능용)
+    List<NoticeVO> searchByTag(String keyword);
 }

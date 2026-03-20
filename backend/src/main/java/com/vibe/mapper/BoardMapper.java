@@ -28,4 +28,8 @@ public interface BoardMapper {
     List<BoardVO> findRequired();
     // 특정 작성자의 게시글 목록을 조회
     List<BoardVO> findByAuthor(String authorId);
+    // 제목에 keyword가 포함된 게시글 목록 조회 (검색 기능용)
+    List<BoardVO> searchByTitle(String keyword);
+    // tags 컬럼에 keyword가 포함된 게시글 목록 조회 (태그 검색 기능용)
+    List<BoardVO> searchByTag(String keyword);
 }

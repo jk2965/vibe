@@ -28,4 +28,8 @@ public interface ArchiveMapper {
     List<ArchiveVO> findRequired();
     // 특정 작성자의 자료실 게시글 목록을 조회
     List<ArchiveVO> findByAuthor(String authorId);
+    // 제목에 keyword가 포함된 자료실 게시글 목록 조회 (검색 기능용)
+    List<ArchiveVO> searchByTitle(String keyword);
+    // tags 컬럼에 keyword가 포함된 자료실 게시글 목록 조회 (태그 검색 기능용)
+    List<ArchiveVO> searchByTag(String keyword);
 }

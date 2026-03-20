@@ -56,4 +56,26 @@
         ORDER BY b.created_at DESC
     </select>
 
+    <!-- 제목 기준 검색: title 컬럼에 keyword 부분 일치 (LIKE '%keyword%') -->
+    <select id="searchByTitle" parameterType="String" resultType="com.vibe.model.BoardVO">
+        SELECT b.id, b.title, b.author_id, b.author_name, b.created_at, b.views, b.is_required, b.tags,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = b.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.board b
+        WHERE b.title LIKE '%' || #{keyword} || '%'
+        ORDER BY b.created_at DESC
+    </select>
+
+    <!-- 태그 기준 검색: tags 컬럼(쉼표 구분 문자열)에서 keyword와 정확히 일치하는 태그를 포함한 게시글 검색
+         쉼표 구분 문자열이므로 태그 위치(단독/앞/뒤/중간)에 따라 4가지 패턴을 OR로 결합 -->
+    <select id="searchByTag" parameterType="String" resultType="com.vibe.model.BoardVO">
+        SELECT b.id, b.title, b.author_id, b.author_name, b.created_at, b.views, b.is_required, b.tags,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = b.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.board b
+        WHERE b.tags = #{keyword}
+           OR b.tags LIKE #{keyword} || ',%'
+           OR b.tags LIKE '%,' || #{keyword}
+           OR b.tags LIKE '%,' || #{keyword} || ',%'
+        ORDER BY b.created_at DESC
+    </select>
+
 </mapper>

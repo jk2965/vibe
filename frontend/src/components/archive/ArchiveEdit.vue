@@ -8,7 +8,7 @@
       :initialTags="form.tags"
       :submitting="submitting"
       :errorMsg="errorMsg"
-      submitBtnColor="#1565c0"
+      submitBtnColor="#1a73e8"
       @submit="handleSubmit"
       @cancel="$router.push(`/archive/${postId}`)"
     />
@@ -46,7 +46,7 @@ export default {
         const res = await axios.get(`http://localhost:8090/api/archive/${this.postId}`)
         this.form.title = res.data.title           // 기존 제목을 폼에 설정
         this.form.content = res.data.content || ''
-        this.form.tags = res.data.tags || '' // 기존 본문을 폼에 설정
+        this.form.tags = res.data.tags || ''      // 기존 태그 목록을 폼에 설정
         this.existingFiles = res.data.files || []  // 기존 첨부 파일 목록 설정
       } catch (e) {
         // 자료 조회 실패 시 자료실 목록 페이지로 이동

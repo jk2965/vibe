@@ -176,8 +176,8 @@ export default {
 }
 .card-header h2 { margin: 0; font-size: 18px; }
 
-.btn-write { padding: 8px 20px; background: #6a1b9a; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
-.btn-write:hover { filter: brightness(0.9); }
+.btn-write { padding: 8px 20px; background: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+.btn-write:hover { background: #1558b0; }
 
 .empty { text-align: center; color: #999; padding: 60px; }
 
@@ -266,7 +266,7 @@ export default {
 .page-btn:not(:disabled):hover { background: #f0f0f0; }
 .page-num { width: 34px; height: 34px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; }
 .page-num:hover { background: #f0f0f0; }
-.page-num.active { background: #6a1b9a; color: white; border-color: #6a1b9a; font-weight: bold; }
+.page-num.active { background: #1a73e8; color: white; border-color: #1a73e8; font-weight: bold; }
 </style>
 
 <style>

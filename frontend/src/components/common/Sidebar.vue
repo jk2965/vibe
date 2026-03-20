@@ -11,6 +11,34 @@
       <button class="btn-write" @click="openWriteModal">✏️ 글쓰기</button>
     </div>
 
+    <!-- 게시글 검색 영역: 제목 또는 태그 기준으로 전체 게시판 통합 검색 -->
+    <div class="sidebar-search-wrap">
+      <!-- 검색 타입 선택: 제목 검색 / 태그 검색 -->
+      <div class="search-type-tabs">
+        <button
+          class="type-tab"
+          :class="{ active: searchType === 'title' }"
+          @click="searchType = 'title'"
+        >제목</button>
+        <button
+          class="type-tab"
+          :class="{ active: searchType === 'tag' }"
+          @click="searchType = 'tag'"
+        >태그</button>
+      </div>
+      <!-- 검색어 입력 및 실행 (Enter 키 또는 검색 버튼으로 실행) -->
+      <div class="search-input-row">
+        <input
+          v-model="searchKeyword"
+          type="text"
+          class="search-input"
+          :placeholder="searchType === 'title' ? '제목 검색...' : '태그 검색...'"
+          @keydown.enter="doSearch"
+        />
+        <button class="btn-search" @click="doSearch">🔍</button>
+      </div>
+    </div>
+
     <nav class="sidebar-nav">
       <router-link to="/required" class="sidebar-item required-item" :class="{ active: isActive('/required') }">
         <span class="item-icon">📌</span>
@@ -87,7 +115,11 @@ export default {
       // 팝업 표시 여부
       showModal: false,
       // 선택한 게시판 글쓰기 경로
-      selectedBoard: ''
+      selectedBoard: '',
+      // 검색 타입: 'title'(제목 검색) 또는 'tag'(태그 검색)
+      searchType: 'title',
+      // 검색창에 입력 중인 검색어
+      searchKeyword: ''
     }
   },
   computed: {
@@ -166,6 +198,13 @@ export default {
       if (!this.selectedBoard) return
       this.$router.push(this.selectedBoard)
       this.closeModal()
+    },
+    // 검색어가 있을 때 /search?type={searchType}&keyword={searchKeyword} 로 이동
+    // SearchResult.vue에서 쿼리 파라미터를 읽어 API 호출 후 결과 표시
+    doSearch() {
+      const kw = this.searchKeyword.trim()
+      if (!kw) return
+      this.$router.push({ path: '/search', query: { type: this.searchType, keyword: kw } })
     }
   }
 }
@@ -194,8 +233,7 @@ export default {
 
 /* 글쓰기 버튼 영역 */
 .sidebar-write-wrap {
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  padding: 12px 16px 10px;
 }
 .btn-write {
   width: 100%;
@@ -210,6 +248,59 @@ export default {
   transition: background 0.15s;
 }
 .btn-write:hover { background: #1558b0; }
+
+/* 검색 영역 */
+.sidebar-search-wrap {
+  padding: 8px 16px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+/* 검색 타입 탭 버튼 (제목 / 태그) */
+.search-type-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.type-tab {
+  flex: 1;
+  padding: 5px 0;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.type-tab:hover { background: #e8f0fe; color: #1a73e8; }
+/* 선택된 탭 강조 */
+.type-tab.active { background: #1a73e8; color: white; border-color: #1a73e8; font-weight: bold; }
+
+/* 검색 입력 + 버튼 행 */
+.search-input-row {
+  display: flex;
+  gap: 4px;
+}
+.search-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  outline: none;
+  min-width: 0;
+}
+.search-input:focus { border-color: #1a73e8; }
+.btn-search {
+  padding: 6px 9px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.btn-search:hover { background: #e8f0fe; }
 
 .sidebar-nav { display: flex; flex-direction: column; padding-top: 6px; }
 

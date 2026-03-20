@@ -19,10 +19,15 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:8080")
 public class MyPostsController {
 
+    // 자유 게시판 내 게시글 조회용 매퍼 (BoardMapper.xml의 findByAuthor 쿼리 사용)
     @Autowired private BoardMapper boardMapper;
+    // 전체 공지사항 내 게시글 조회용 매퍼 (NoticeMapper.xml의 findByAuthor 쿼리 사용)
     @Autowired private NoticeMapper noticeMapper;
+    // 팀별 공지사항 내 게시글 조회용 매퍼 (TeamNoticeMapper.xml의 findByAuthor 쿼리 사용)
     @Autowired private TeamNoticeMapper teamNoticeMapper;
+    // 전사 자료실 내 게시글 조회용 매퍼 (ArchiveMapper.xml의 findByAuthor 쿼리 사용)
     @Autowired private ArchiveMapper archiveMapper;
+    // 팀별 자료실 내 게시글 조회용 매퍼 (TeamArchiveMapper.xml의 findByAuthor 쿼리 사용)
     @Autowired private TeamArchiveMapper teamArchiveMapper;
 
     /**

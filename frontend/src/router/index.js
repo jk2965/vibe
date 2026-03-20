@@ -81,6 +81,8 @@ const routes = [
   { path: '/required', component: () => import('../components/RequiredPosts.vue'), beforeEnter: requireAuth },
   // 내 게시글 통합 목록 페이지 (로그인 필요)
   { path: '/my-posts', component: () => import('../components/MyPosts.vue'), beforeEnter: requireAuth },
+  // 게시글 통합 검색 결과 페이지 - ?type=title|tag&keyword={검색어} 쿼리 파라미터 사용 (로그인 필요)
+  { path: '/search', component: () => import('../components/SearchResult.vue'), beforeEnter: requireAuth },
   // FAQ 목록 페이지 (로그인 필요)
   { path: '/faq', component: () => import('../components/faq/Faq.vue'), beforeEnter: requireAuth },
   // FAQ 글쓰기 - 관리자/팀장만 접근 가능

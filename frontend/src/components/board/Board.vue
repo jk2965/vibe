@@ -122,8 +122,8 @@ export default {
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .card-header h2 { margin: 0; font-size: 18px; }
 
-.btn-write { padding: 8px 20px; background: #1976d2; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
-.btn-write:hover { background: #1565c0; }
+.btn-write { padding: 8px 20px; background: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+.btn-write:hover { background: #1558b0; }
 
 .board-table { width: 100%; border-collapse: collapse; }
 .board-table th, .board-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
@@ -136,7 +136,7 @@ export default {
 .post-row { cursor: pointer; }
 .post-row:hover { background: #f9f9f9; }
 .title-cell { color: #1a1a1a; font-weight: 500; }
-.comment-count { color: #1976d2; font-size: 13px; margin-left: 4px; }
+.comment-count { color: #1a73e8; font-size: 13px; margin-left: 4px; }
 .empty { text-align: center; color: #999; padding: 40px; }
 
 .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 24px; }
@@ -145,5 +145,5 @@ export default {
 .page-btn:not(:disabled):hover { background: #f0f0f0; }
 .page-num { width: 34px; height: 34px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; }
 .page-num:hover { background: #f0f0f0; }
-.page-num.active { background: #1976d2; color: white; border-color: #1976d2; font-weight: bold; }
+.page-num.active { background: #1a73e8; color: white; border-color: #1a73e8; font-weight: bold; }
 </style>

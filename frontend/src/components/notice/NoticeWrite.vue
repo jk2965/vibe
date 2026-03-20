@@ -5,7 +5,7 @@
       :submitting="submitting"
       :errorMsg="errorMsg"
       :showRequired="true"
-      submitBtnColor="#00796b"
+      submitBtnColor="#1a73e8"
       @submit="handleSubmit"
       @cancel="$router.push('/notice')"
     />

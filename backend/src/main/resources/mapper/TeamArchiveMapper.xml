@@ -60,4 +60,27 @@
         ORDER BY a.created_at DESC
     </select>
 
+    <!-- 제목 기준 검색: title 컬럼에 keyword 부분 일치 -->
+    <select id="searchByTitle" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
+               (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
+        FROM vibe.team_archive a
+        WHERE a.title LIKE '%' || #{keyword} || '%'
+        ORDER BY a.created_at DESC
+    </select>
+
+    <!-- 태그 기준 검색: tags 컬럼(쉼표 구분 문자열)에서 keyword와 정확히 일치하는 태그를 포함한 팀 자료실 검색 -->
+    <select id="searchByTag" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
+        SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
+               (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
+        FROM vibe.team_archive a
+        WHERE a.tags = #{keyword}
+           OR a.tags LIKE #{keyword} || ',%'
+           OR a.tags LIKE '%,' || #{keyword}
+           OR a.tags LIKE '%,' || #{keyword} || ',%'
+        ORDER BY a.created_at DESC
+    </select>
+
 </mapper>

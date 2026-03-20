@@ -8,7 +8,7 @@
       :initialTags="form.tags"
       :submitting="submitting"
       :errorMsg="errorMsg"
-      submitBtnColor="#2e7d32"
+      submitBtnColor="#1a73e8"
       @submit="handleSubmit"
       @cancel="$router.push(`/team-archive/${postId}`)"
     />
@@ -54,7 +54,7 @@ export default {
         // 기존 제목과 내용을 폼에 설정
         this.form.title = res.data.title
         this.form.content = res.data.content || ''
-        this.form.tags = res.data.tags || ''
+        this.form.tags = res.data.tags || ''  // 기존 태그 목록을 폼에 설정
         // 기존 첨부 파일 목록 설정
         this.existingFiles = res.data.files || []
       } catch (e) {

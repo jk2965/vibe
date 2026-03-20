@@ -17,16 +17,16 @@
         <span>조회 {{ post.views }}</span>
       </div>
     </div>
-    <!-- 태그 표시 -->
-    <div v-if="postTags.length > 0" class="tag-list">
-      <span v-for="tag in postTags" :key="tag" class="tag-chip">{{ tag }}</span>
-    </div>
     <div class="post-content tiptap-display" v-html="post.content"></div>
     <FileList
       :files="post.files || []"
       :canDelete="canDelete"
       @file-deleted="$emit('file-deleted', $event)"
     />
+    <!-- 태그 표시 -->
+    <div v-if="postTags.length > 0" class="tag-list">
+      <span v-for="tag in postTags" :key="tag" class="tag-chip">{{ tag }}</span>
+    </div>
     <div class="btn-row">
       <button @click="$router.push(backRoute)" class="btn-back">목록으로</button>
       <div class="btn-right">
@@ -100,7 +100,7 @@ export default {
 .btn-edit:hover { background: #e65100; }
 .btn-delete { padding: 10px 24px; background: #e53935; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
 .btn-delete:hover { background: #c62828; }
-.tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; margin-bottom: 16px; }
 .tag-chip { background: #e3f2fd; color: #1565c0; border-radius: 16px; padding: 3px 12px; font-size: 13px; }
 </style>
 

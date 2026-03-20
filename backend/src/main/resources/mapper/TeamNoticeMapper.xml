@@ -64,4 +64,25 @@
         ORDER BY n.created_at DESC
     </select>
 
+    <!-- 제목 기준 검색: title 컬럼에 keyword 부분 일치 -->
+    <select id="searchByTitle" parameterType="String" resultType="com.vibe.model.TeamNoticeVO">
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team, n.is_required, n.tags,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.team_notice n
+        WHERE n.title LIKE '%' || #{keyword} || '%'
+        ORDER BY n.created_at DESC
+    </select>
+
+    <!-- 태그 기준 검색: tags 컬럼(쉼표 구분 문자열)에서 keyword와 정확히 일치하는 태그를 포함한 팀 공지사항 검색 -->
+    <select id="searchByTag" parameterType="String" resultType="com.vibe.model.TeamNoticeVO">
+        SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.team, n.is_required, n.tags,
+               (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
+        FROM vibe.team_notice n
+        WHERE n.tags = #{keyword}
+           OR n.tags LIKE #{keyword} || ',%'
+           OR n.tags LIKE '%,' || #{keyword}
+           OR n.tags LIKE '%,' || #{keyword} || ',%'
+        ORDER BY n.created_at DESC
+    </select>
+
 </mapper>
