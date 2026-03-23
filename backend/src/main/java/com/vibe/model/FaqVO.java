@@ -1,10 +1,12 @@
 package com.vibe.model;
 
+import java.util.List;
+
 /**
  * FAQ(자주 묻는 질문) 게시글 정보를 담는 Value Object 클래스.
  * FaqMapper.java, FaqService.java에서 사용되며,
  * 관리자(UserVO.java의 isAdmin=1)만 작성·수정·삭제 가능.
- * FAQ는 첨부 파일 및 댓글 기능 없이 단순 Q&A 형태로 운영됨.
+ * 첨부 파일은 archive_file 테이블을 공유하며, ArchiveFileVO 목록으로 관리됨.
  */
 public class FaqVO {
 
@@ -22,6 +24,8 @@ public class FaqVO {
     private String createdAt;
     /** 조회수 */
     private Integer views;
+    /** 첨부 파일 목록 (FaqService.getDetail() 조회 시 채워짐, archive_file 테이블 공유) */
+    private List<ArchiveFileVO> files;
 
     /** id 필드 반환 */
     public String getId() { return id; }
@@ -51,4 +55,8 @@ public class FaqVO {
     public Integer getViews() { return views; }
     /** views 필드 설정 */
     public void setViews(Integer views) { this.views = views; }
+    /** files 필드 반환 (상세 조회 시 첨부파일 목록) */
+    public List<ArchiveFileVO> getFiles() { return files; }
+    /** files 필드 설정 */
+    public void setFiles(List<ArchiveFileVO> files) { this.files = files; }
 }

@@ -25,20 +25,22 @@ export default {
     // 표시할 파일 객체 배열 (id, originalName, fileSize 필드 포함)
     files: { type: Array, default: () => [] },
     // 삭제 버튼 표시 여부 (작성자/관리자일 때 true, PostDetailCard에서 canDelete prop 전달)
-    canDelete: { type: Boolean, default: false }
+    canDelete: { type: Boolean, default: false },
+    // 파일 API 기본 경로 (기본: /api/archive, FAQ는 /api/faq로 전달)
+    apiBase: { type: String, default: '/api/archive' }
   },
   // 파일 삭제 후 부모 컴포넌트에 삭제된 파일 ID를 emit (부모에서 로컬 목록 갱신)
   emits: ['file-deleted'],
   methods: {
-    // 새 탭에서 파일 다운로드 (GET /api/archive/files/:id/download)
+    // 새 탭에서 파일 다운로드 (GET {apiBase}/files/:id/download)
     download(file) {
-      window.open(`http://localhost:8090/api/archive/files/${file.id}/download`, '_blank')
+      window.open(`http://localhost:8090${this.apiBase}/files/${file.id}/download`, '_blank')
     },
-    // DELETE /api/archive/files/:id - 서버에서 파일 삭제 후 부모에게 file-deleted 이벤트 emit
+    // DELETE {apiBase}/files/:id - 서버에서 파일 삭제 후 부모에게 file-deleted 이벤트 emit
     async remove(file) {
       if (!confirm(`'${file.originalName}' 파일을 삭제하시겠습니까?`)) return
       try {
-        await axios.delete(`http://localhost:8090/api/archive/files/${file.id}`, {
+        await axios.delete(`http://localhost:8090${this.apiBase}/files/${file.id}`, {
           // requesterId 쿼리 파라미터로 본인/권한 확인
           params: { requesterId: localStorage.getItem('userId') }
         })

@@ -4,10 +4,9 @@
     <PostEditForm
       titleLabel="질문"
       contentLabel="답변"
-      :showFiles="false"
-      :imageUploadUrl="null"
       :initialTitle="initialTitle"
       :initialContent="initialContent"
+      :existingFiles="existingFiles"
       :submitting="submitting"
       :errorMsg="errorMsg"
       submitBtnColor="#1a73e8"
@@ -21,7 +20,7 @@
 import axios from 'axios'
 // 공통 페이지 헤더 컴포넌트 (PageHeader.vue)
 import PageHeader from '../common/PageHeader.vue'
-// 공통 게시글 수정 폼 컴포넌트 (PostEditForm.vue) - showFiles=false로 파일 첨부 숨김
+// 공통 게시글 수정 폼 컴포넌트 (PostEditForm.vue) — 기존 파일 목록 및 새 파일 추가 포함
 import PostEditForm from '../common/PostEditForm.vue'
 
 export default {
@@ -33,6 +32,8 @@ export default {
       initialTitle: '',
       // 기존 FAQ 내용 (PostEditForm의 initialContent prop으로 전달)
       initialContent: '',
+      // 서버에 이미 저장된 기존 첨부파일 목록 (PostEditForm의 existingFiles prop으로 전달)
+      existingFiles: [],
       // 폼 제출 중 여부 (중복 제출 방지)
       submitting: false,
       // 오류 메시지
@@ -61,20 +62,31 @@ export default {
         // 기존 제목과 내용을 폼 초기값으로 설정
         this.initialTitle = faq.title
         this.initialContent = faq.content || ''
+        // 기존 첨부파일 목록 설정 (PostEditForm의 FileList에 표시됨)
+        this.existingFiles = faq.files || []
       } catch (e) {
         console.error('FAQ 로드 실패:', e)
       }
     },
-    // PostEditForm에서 submit 이벤트 발생 시 호출 (파일 없이 title, content만 사용)
-    // PUT /api/faq/:id 호출 → FaqController.java (FAQ 질문 수정)
-    async handleSubmit({ title, content }) {
+    // PostEditForm에서 submit 이벤트 발생 시 호출 - FAQ 수정 후 새 첨부파일 순차 업로드
+    // PUT /api/faq/:id → FaqController.java (FAQ 질문 수정)
+    // POST /api/faq/:id/files → FaqController.java (새 파일 첨부 업로드)
+    async handleSubmit({ title, content, pendingFiles }) {
       this.submitting = true
       this.errorMsg = ''
       try {
         const userId = localStorage.getItem('userId') || ''
-        await axios.put(`/api/faq/${this.$route.params.id}`, { title, content }, {
+        const postId = this.$route.params.id
+        await axios.put(`/api/faq/${postId}`, { title, content }, {
           params: { requesterId: userId }
         })
+        // 새로 추가된 첨부 파일이 있는 경우 순차적으로 업로드
+        for (const file of pendingFiles) {
+          const fd = new FormData()
+          fd.append('file', file)
+          // POST /api/faq/:id/files → FaqController.java: 파일 추가 업로드
+          await axios.post(`http://localhost:8090/api/faq/${postId}/files`, fd, { params: { requesterId: userId } })
+        }
         // 수정 완료 후 FAQ 목록으로 이동
         this.$router.push('/faq')
       } catch (e) {

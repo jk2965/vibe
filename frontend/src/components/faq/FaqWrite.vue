@@ -4,8 +4,6 @@
     <PostWriteForm
       titleLabel="질문"
       contentLabel="답변"
-      :showFiles="false"
-      :imageUploadUrl="null"
       :submitting="submitting"
       :errorMsg="errorMsg"
       submitBtnColor="#1a73e8"
@@ -34,18 +32,26 @@ export default {
     }
   },
   methods: {
-    // PostWriteForm에서 submit 이벤트 발생 시 호출 (파일 없이 title, content만 사용)
-    // POST /api/faq 호출 → FaqController.java (FAQ 질문 등록)
-    async handleSubmit({ title, content }) {
+    // PostWriteForm에서 submit 이벤트 발생 시 호출 - FAQ 등록 후 첨부파일 순차 업로드
+    // POST /api/faq → FaqController.java (FAQ 질문 등록)
+    // POST /api/faq/:id/files → FaqController.java (파일 첨부 업로드)
+    async handleSubmit({ title, content, pendingFiles }) {
       this.submitting = true
       this.errorMsg = ''
       try {
         // 로컬스토리지에서 작성자 정보 읽기
         const userId = localStorage.getItem('userId') || ''
         const username = localStorage.getItem('username') || ''
-        await axios.post('/api/faq', {
+        const res = await axios.post('/api/faq', {
           title, content, authorId: userId, authorName: username
         }, { params: { requesterId: userId } })
+        // 첨부 파일이 있는 경우 순차적으로 업로드
+        for (const file of pendingFiles) {
+          const fd = new FormData()
+          fd.append('file', file)
+          // POST /api/faq/:id/files → FaqController.java: 파일 첨부 업로드
+          await axios.post(`http://localhost:8090/api/faq/${res.data.id}/files`, fd, { params: { requesterId: userId } })
+        }
         // 등록 완료 후 FAQ 목록으로 이동
         this.$router.push('/faq')
       } catch (e) {

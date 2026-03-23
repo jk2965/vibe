@@ -16,6 +16,14 @@
             <span>조회 {{ faq.views }}</span>
           </div>
           <div class="faq-content tiptap-display" v-html="faq.content"></div>
+          <!-- 첨부파일 목록: FAQ 파일은 /api/faq/files/... 엔드포인트 사용 -->
+          <FileList
+            v-if="faq.files && faq.files.length > 0"
+            :files="faq.files"
+            :canDelete="canDelete"
+            apiBase="/api/faq"
+            @file-deleted="handleFileDeleted"
+          />
         </div>
       </div>
 
@@ -65,10 +73,12 @@ import axios from 'axios'
 import PageHeader from '../common/PageHeader.vue'
 // Tiptap 리치텍스트 에디터 컴포넌트 (TiptapEditor.vue) - 관리자 답변 입력에 사용
 import TiptapEditor from '../common/TiptapEditor.vue'
+// 첨부파일 목록 표시 및 다운로드/삭제 컴포넌트 (FileList.vue)
+import FileList from '../common/FileList.vue'
 
 export default {
   name: 'FaqDetail',
-  components: { PageHeader, TiptapEditor },
+  components: { PageHeader, TiptapEditor, FileList },
   data() {
     return {
       // 조회된 FAQ 상세 데이터 (질문, 답변, 작성자 정보 포함)
@@ -150,6 +160,12 @@ export default {
         this.$router.push('/faq')
       } catch (e) {
         alert(e.response?.data?.message || '삭제 중 오류가 발생했습니다.')
+      }
+    },
+    // FileList에서 file-deleted 이벤트 수신 시 로컬 파일 목록에서 해당 파일 제거
+    handleFileDeleted(fileId) {
+      if (this.faq && this.faq.files) {
+        this.faq.files = this.faq.files.filter(f => f.id !== fileId)
       }
     },
     // 날짜 문자열에서 'YYYY-MM-DD' 형식만 추출
