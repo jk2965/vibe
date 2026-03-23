@@ -15,6 +15,10 @@
         <div class="accordion-header" @click="toggle(faq)">
           <span class="q-num">Q.{{ String(index + 1).padStart(2, '0') }}</span>
           <span class="q-title">{{ faq.title }}</span>
+          <!-- 첨부파일이 있는 경우 파일명과 개수 표시 -->
+          <span v-if="faq.fileCount > 0" class="faq-file-badge">
+            📎 {{ faq.firstFileName }}<span v-if="faq.fileCount > 1"> 외 {{ faq.fileCount - 1 }}개</span>
+          </span>
           <span class="toggle-btn">{{ openId === faq.id ? '닫기 ∧' : '열기 ∨' }}</span>
         </div>
 
@@ -209,6 +213,16 @@ export default {
 
 .q-title { flex: 1; font-size: 15px; color: #222; font-weight: 500; }
 
+.faq-file-badge {
+  font-size: 12px;
+  color: #555;
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .toggle-btn {
   font-size: 13px;
   color: #6a1b9a;
@@ -278,4 +292,8 @@ export default {
 .tiptap-display img { max-width: 100%; border-radius: 4px; }
 .tiptap-display pre { background: #f4f4f4; border-radius: 4px; padding: 12px; overflow-x: auto; margin: 8px 0; }
 .tiptap-display pre code.hljs { background: #f4f4f4; border-radius: 4px; font-size: 13px; padding: 0; }
+/* 표(테이블) 스타일 */
+.tiptap-display table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+.tiptap-display th, .tiptap-display td { border: 1px solid #ccc; padding: 8px 10px; font-size: 14px; }
+.tiptap-display th { background: #f5f5f5; font-weight: bold; }
 </style>

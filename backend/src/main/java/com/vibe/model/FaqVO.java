@@ -24,6 +24,10 @@ public class FaqVO {
     private String createdAt;
     /** 조회수 */
     private Integer views;
+    /** 첨부 파일 수 (목록 조회 시 서브쿼리로 집계) */
+    private Integer fileCount;
+    /** 첫 번째 첨부 파일 원본명 (목록에서 미리보기용) */
+    private String firstFileName;
     /** 첨부 파일 목록 (FaqService.getDetail() 조회 시 채워짐, archive_file 테이블 공유) */
     private List<ArchiveFileVO> files;
 
@@ -55,6 +59,14 @@ public class FaqVO {
     public Integer getViews() { return views; }
     /** views 필드 설정 */
     public void setViews(Integer views) { this.views = views; }
+    /** fileCount 필드 반환 */
+    public Integer getFileCount() { return fileCount; }
+    /** fileCount 필드 설정 */
+    public void setFileCount(Integer fileCount) { this.fileCount = fileCount; }
+    /** firstFileName 필드 반환 */
+    public String getFirstFileName() { return firstFileName; }
+    /** firstFileName 필드 설정 */
+    public void setFirstFileName(String firstFileName) { this.firstFileName = firstFileName; }
     /** files 필드 반환 (상세 조회 시 첨부파일 목록) */
     public List<ArchiveFileVO> getFiles() { return files; }
     /** files 필드 설정 */

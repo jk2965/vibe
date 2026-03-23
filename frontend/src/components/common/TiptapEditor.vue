@@ -32,9 +32,36 @@
       <button type="button" @click="insertYoutube" title="YouTube 영상 삽입">YouTube</button>
       <button type="button" @click="insertIframe" title="외부 영상/URL 임베드">외부영상</button>
       <span class="divider"></span>
+      <!-- 표 삽입 드롭다운 -->
+      <div class="dropdown-wrap" ref="tableDropdown">
+        <button type="button" @click="toggleTableMenu" :class="{ active: editor.isActive('table') }" title="표 삽입/편집">표</button>
+        <div v-if="showTableMenu" class="dropdown-menu">
+          <button type="button" @click="insertTable">표 삽입 (3×3)</button>
+          <hr>
+          <button type="button" @click="editor.chain().focus().addColumnBefore().run()">열 앞에 추가</button>
+          <button type="button" @click="editor.chain().focus().addColumnAfter().run()">열 뒤에 추가</button>
+          <button type="button" @click="editor.chain().focus().deleteColumn().run()">현재 열 삭제</button>
+          <hr>
+          <button type="button" @click="editor.chain().focus().addRowBefore().run()">행 위에 추가</button>
+          <button type="button" @click="editor.chain().focus().addRowAfter().run()">행 아래에 추가</button>
+          <button type="button" @click="editor.chain().focus().deleteRow().run()">현재 행 삭제</button>
+          <hr>
+          <button type="button" @click="editor.chain().focus().deleteTable().run()">표 삭제</button>
+        </div>
+      </div>
+      <!-- 차트 삽입 버튼 -->
+      <button type="button" @click="showChartModal = true" title="차트/그래프 삽입">차트</button>
+      <span class="divider"></span>
       <button type="button" @click="editor.chain().focus().unsetAllMarks().clearNodes().run()" title="서식 초기화">초기화</button>
     </div>
     <editor-content :editor="editor" class="tiptap-content" />
+
+    <!-- 차트 삽입 모달 -->
+    <ChartInsertModal
+      v-if="showChartModal"
+      @close="showChartModal = false"
+      @insert="onChartInsert"
+    />
   </div>
 </template>
 
@@ -55,6 +82,13 @@ import Link from '@tiptap/extension-link'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 // YouTube 영상 임베드 확장 임포트
 import Youtube from '@tiptap/extension-youtube'
+// 표(테이블) 관련 Tiptap 확장 임포트 (v3.x는 named export 사용)
+import { Table } from '@tiptap/extension-table'
+import { TableRow } from '@tiptap/extension-table-row'
+import { TableHeader } from '@tiptap/extension-table-header'
+import { TableCell } from '@tiptap/extension-table-cell'
+// 차트 삽입 모달 컴포넌트 임포트
+import ChartInsertModal from './ChartInsertModal.vue'
 
 // 외부 iframe 임베드를 위한 커스텀 Tiptap 노드 정의 (네이버TV, 카카오TV, Vimeo 등)
 const IframeExtension = Node.create({
@@ -106,8 +140,8 @@ lowlight.registerLanguage('bash', bash)
 // PostWriteForm.vue와 PostEditForm.vue에서 v-model로 사용되는 리치 텍스트 에디터 컴포넌트
 export default {
   name: 'TiptapEditor',
-  // EditorContent: Tiptap이 실제 에디터 DOM을 렌더링하는 컴포넌트
-  components: { EditorContent },
+  // EditorContent: Tiptap 에디터 DOM 렌더링 / ChartInsertModal: 차트 삽입 모달
+  components: { EditorContent, ChartInsertModal },
   props: {
     // 부모로부터 v-model로 전달받는 HTML 문자열 (초기 에디터 내용)
     modelValue: { type: String, default: '' },
@@ -119,7 +153,11 @@ export default {
   data() {
     return {
       // Tiptap Editor 인스턴스 (mounted에서 초기화)
-      editor: null
+      editor: null,
+      // 표 편집 드롭다운 메뉴 표시 여부
+      showTableMenu: false,
+      // 차트 삽입 모달 표시 여부
+      showChartModal: false,
     }
   },
   watch: {
@@ -131,6 +169,14 @@ export default {
     }
   },
   mounted() {
+    // 표 드롭다운 외부 클릭 시 닫기
+    this._closeTableMenu = (e) => {
+      if (this.$refs.tableDropdown && !this.$refs.tableDropdown.contains(e.target)) {
+        this.showTableMenu = false
+      }
+    }
+    document.addEventListener('click', this._closeTableMenu)
+
     // 컴포넌트 마운트 시 Tiptap 에디터 인스턴스 생성 및 확장 등록
     this.editor = new Editor({
       // 초기 내용은 부모로부터 전달받은 HTML 문자열
@@ -149,7 +195,12 @@ export default {
         // YouTube: 개인정보 보호 모드(nocookie) 활성화
         Youtube.configure({ width: 640, height: 360, nocookie: true }),
         // 커스텀 iframe 임베드 확장
-        IframeExtension
+        IframeExtension,
+        // 표(테이블) 확장: 헤더 셀 포함, 열/행 추가·삭제 지원
+        Table.configure({ resizable: false }),
+        TableRow,
+        TableHeader,
+        TableCell
       ],
       // 에디터 내용이 변경될 때마다 부모 컴포넌트에 HTML 값 emit
       onUpdate: () => {
@@ -158,6 +209,8 @@ export default {
     })
   },
   beforeUnmount() {
+    // 표 드롭다운 외부 클릭 이벤트 리스너 제거
+    document.removeEventListener('click', this._closeTableMenu)
     // 컴포넌트 언마운트 전 에디터 인스턴스 메모리 해제
     this.editor.destroy()
   },
@@ -190,6 +243,20 @@ export default {
     // 숨겨진 파일 input을 클릭하여 이미지 선택 다이얼로그 열기
     triggerImage() {
       this.$refs.imageInput.click()
+    },
+    // 표 편집 드롭다운 열기/닫기 토글
+    toggleTableMenu() {
+      this.showTableMenu = !this.showTableMenu
+    },
+    // 3×3 기본 표를 에디터 커서 위치에 삽입
+    insertTable() {
+      this.editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+      this.showTableMenu = false
+    },
+    // 차트 삽입 모달에서 base64 이미지 URL을 받아 에디터에 이미지로 삽입
+    onChartInsert(dataUrl) {
+      this.editor.chain().focus().setImage({ src: dataUrl }).run()
+      this.showChartModal = false
     },
     // 선택한 이미지 파일을 서버(imageUploadUrl)에 업로드 후 에디터에 삽입하는 비동기 메서드
     async handleImageUpload(e) {
@@ -252,6 +319,34 @@ export default {
   margin: 2px 4px;
   align-self: stretch;
 }
+/* 표 드롭다운 */
+.dropdown-wrap { position: relative; }
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 999;
+  min-width: 140px;
+  padding: 4px 0;
+}
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 7px 14px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dropdown-menu button:hover { background: #f5f5f5; }
+.dropdown-menu hr { margin: 4px 0; border: none; border-top: 1px solid #eee; }
 .tiptap-content {
   min-height: 300px;
   padding: 16px;
@@ -282,4 +377,11 @@ export default {
   float: left;
   height: 0;
 }
+/* 에디터 내 표 스타일 */
+.tiptap-content .ProseMirror table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+.tiptap-content .ProseMirror th,
+.tiptap-content .ProseMirror td { border: 1px solid #ccc; padding: 8px 10px; font-size: 14px; min-width: 60px; position: relative; }
+.tiptap-content .ProseMirror th { background: #f5f5f5; font-weight: bold; }
+/* 표 셀 선택 시 파란색 반투명 오버레이로 선택 영역 강조 (pointer-events 제거로 클릭 이벤트 통과) */
+.tiptap-content .ProseMirror .selectedCell::after { content: ''; position: absolute; inset: 0; background: rgba(26,115,232,0.08); pointer-events: none; }
 </style>

@@ -88,7 +88,13 @@ const routes = [
   // FAQ 글쓰기 - 관리자/팀장만 접근 가능
   { path: '/faq/write', component: () => import('../components/faq/FaqWrite.vue'), beforeEnter: requireAdmin },
   // FAQ 글 수정 - 관리자/팀장만 접근 가능
-  { path: '/faq/edit/:id', component: () => import('../components/faq/FaqEdit.vue'), beforeEnter: requireAdmin }
+  { path: '/faq/edit/:id', component: () => import('../components/faq/FaqEdit.vue'), beforeEnter: requireAdmin },
+  // Q&A 질문 목록 (로그인 필요, 모든 사용자 접근 가능)
+  { path: '/qna', component: () => import('../components/qna/Qna.vue'), beforeEnter: requireAuth },
+  // Q&A 질문 작성 (로그인 필요, 모든 사용자 작성 가능)
+  { path: '/qna/write', component: () => import('../components/qna/QnaWrite.vue'), beforeEnter: requireAuth },
+  // Q&A 질문 상세 + 답변 (로그인 필요, 답변 작성은 관리자/팀장만)
+  { path: '/qna/:id', component: () => import('../components/qna/QnaDetail.vue'), beforeEnter: requireAuth }
 ]
 
 // HTML5 History 모드로 라우터 생성 후 main.js에서 use(router)로 등록됨

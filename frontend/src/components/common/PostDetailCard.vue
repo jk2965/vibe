@@ -115,4 +115,8 @@ export default {
 .tiptap-display pre code.hljs { background: #f4f4f4; border-radius: 4px; font-size: 13px; padding: 0; }
 .tiptap-display img { max-width: 100%; height: auto; border-radius: 4px; }
 .tiptap-display iframe { max-width: 100%; border-radius: 6px; display: block; margin: 8px 0; }
+/* 표(테이블) 스타일 */
+.tiptap-display table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+.tiptap-display th, .tiptap-display td { border: 1px solid #ccc; padding: 8px 10px; font-size: 14px; }
+.tiptap-display th { background: #f5f5f5; font-weight: bold; }
 </style>

@@ -29,6 +29,10 @@ public class ArchiveVO {
     private Integer isRequired;
     /** 검색용 태그 목록 (쉼표 구분 문자열, 최대 10개) */
     private String tags;
+    /** 첨부 파일 수 (목록 조회 시 서브쿼리로 집계) */
+    private Integer fileCount;
+    /** 첫 번째 첨부 파일 원본명 (목록에서 미리보기용) */
+    private String firstFileName;
     /** 첨부 파일 목록 (ArchiveFileVO.java 참조, ArchiveFileMapper.java에서 조회) */
     private List<ArchiveFileVO> files;
 
@@ -72,6 +76,14 @@ public class ArchiveVO {
     public String getTags() { return tags; }
     /** tags 필드 설정 */
     public void setTags(String tags) { this.tags = tags; }
+    /** fileCount 필드 반환 */
+    public Integer getFileCount() { return fileCount; }
+    /** fileCount 필드 설정 */
+    public void setFileCount(Integer fileCount) { this.fileCount = fileCount; }
+    /** firstFileName 필드 반환 */
+    public String getFirstFileName() { return firstFileName; }
+    /** firstFileName 필드 설정 */
+    public void setFirstFileName(String firstFileName) { this.firstFileName = firstFileName; }
     /** files 필드 반환 */
     public List<ArchiveFileVO> getFiles() { return files; }
     /** files 필드 설정 */

@@ -1,11 +1,12 @@
 <template>
   <div class="board-container">
-    <PageHeader title="전체 자료실" />
+    <PageHeader title="Q&A" />
 
     <div class="list-card">
       <div class="card-header">
-        <h2>자료실 목록</h2>
-        <button v-if="canWrite" @click="$router.push('/archive/write')" class="btn-write">글쓰기</button>
+        <h2>Q&A 게시판</h2>
+        <!-- 모든 로그인 사용자가 질문 작성 가능 -->
+        <button @click="$router.push('/qna/write')" class="btn-write">질문하기</button>
       </div>
 
       <table class="board-table">
@@ -15,35 +16,32 @@
             <th class="col-title">제목</th>
             <th class="col-author">작성자</th>
             <th class="col-date">작성일</th>
-            <th class="col-file">파일</th>
+            <th class="col-answer">답변</th>
             <th class="col-views">조회</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="posts.length === 0">
-            <td colspan="6" class="empty">등록된 자료가 없습니다.</td>
+            <td colspan="6" class="empty">등록된 질문이 없습니다.</td>
           </tr>
           <tr v-for="(post, index) in posts" :key="post.id" @click="goDetail(post.id)" class="post-row">
+            <!-- 역순 번호: 전체 수 - 이전 페이지 항목 수 - 현재 인덱스 -->
             <td class="col-no">{{ totalCount - (pageNum - 1) * 10 - index }}</td>
-            <td class="col-title title-cell">
-              {{ post.title }}
-              <span v-if="post.commentCount > 0" class="comment-count">[{{ post.commentCount }}]</span>
-              <span v-if="post.fileCount > 0" class="file-badge">📎{{ post.fileCount }}</span>
-            </td>
+            <td class="col-title title-cell">{{ post.title }}</td>
             <td class="col-author">{{ post.authorName }}</td>
             <td class="col-date">{{ formatDate(post.createdAt) }}</td>
-            <td class="col-file">
-                <template v-if="post.fileCount > 0">
-                  <span class="file-name-cell">📎 {{ post.firstFileName }}</span>
-                  <span v-if="post.fileCount > 1" class="file-extra"> 외 {{ post.fileCount - 1 }}개</span>
-                </template>
-                <span v-else>-</span>
-              </td>
+            <td class="col-answer">
+              <!-- 답변 수와 상태를 함께 표시 -->
+              <span :class="post.answerCount > 0 ? 'badge-answered' : 'badge-waiting'">
+                {{ post.answerCount > 0 ? `답변 ${post.answerCount}` : '답변대기' }}
+              </span>
+            </td>
             <td class="col-views">{{ post.views }}</td>
           </tr>
         </tbody>
       </table>
 
+      <!-- 페이지네이션 -->
       <div class="pagination">
         <button @click="changePage(pageNum - 1)" :disabled="pageNum <= 1" class="page-btn">이전</button>
         <button
@@ -60,28 +58,26 @@
 
 <script>
 import axios from 'axios'
-// PageHeader.vue 공통 헤더 컴포넌트 사용
+// 공통 페이지 헤더 컴포넌트
 import PageHeader from '../common/PageHeader.vue'
 
 export default {
-  name: 'Archive',
-  // PageHeader.vue 컴포넌트 등록
+  name: 'Qna',
   components: { PageHeader },
   data() {
-    // 로컬스토리지에서 관리자 레벨 숫자로 파싱 (없으면 0 기본값)
-    const adminLevel = parseInt(localStorage.getItem('adminLevel') || '0')
-    // 로컬스토리지에서 팀장 여부 로드
-    const isTeamLeader = localStorage.getItem('isTeamLeader') === 'true'
     return {
-      posts: [],        // 자료실 게시글 목록 배열
-      pageNum: 1,       // 현재 페이지 번호
-      totalPages: 1,    // 전체 페이지 수
-      totalCount: 0,    // 전체 자료 수 (역순 번호 계산에 사용)
-      canWrite: adminLevel >= 1 || isTeamLeader  // 글쓰기 권한: 관리자(레벨 1 이상) 또는 팀장만 허용
+      // Q&A 질문 목록
+      posts: [],
+      // 현재 페이지 번호
+      pageNum: 1,
+      // 전체 페이지 수
+      totalPages: 1,
+      // 전체 질문 수 (역순 번호 계산용)
+      totalCount: 0
     }
   },
   computed: {
-    // 현재 페이지 그룹에 해당하는 페이지 번호 배열 반환 (5개 단위로 그룹화)
+    // 현재 페이지 그룹의 페이지 번호 배열 (5개 단위)
     pageRange() {
       const start = Math.floor((this.pageNum - 1) / 5) * 5 + 1
       const end = Math.min(start + 4, this.totalPages)
@@ -90,35 +86,33 @@ export default {
       return range
     }
   },
-  // 컴포넌트 마운트 시 자료실 목록을 즉시 조회
   mounted() {
+    // 컴포넌트 마운트 시 질문 목록 조회
     this.fetchPosts()
   },
   methods: {
-    // GET /api/archive → ArchiveController.java: 자료실 목록 페이징 조회
+    // GET /api/qna 호출 → QnaController.java: 페이지별 질문 목록 조회
     async fetchPosts() {
       try {
-        const res = await axios.get('http://localhost:8090/api/archive', {
-          params: { pageNum: this.pageNum }  // 현재 페이지 번호를 쿼리 파라미터로 전달
-        })
-        this.posts = res.data.list        // 자료실 목록 저장
-        this.totalPages = res.data.pages  // 전체 페이지 수 저장
-        this.totalCount = res.data.total  // 전체 자료 수 저장
+        const res = await axios.get('/api/qna', { params: { pageNum: this.pageNum } })
+        this.posts = res.data.list
+        this.totalPages = res.data.pages
+        this.totalCount = res.data.total
       } catch (e) {
-        console.error('자료실 목록 조회 실패:', e)
+        console.error('Q&A 목록 조회 실패:', e)
       }
     },
-    // 페이지 변경 처리: 유효 범위 체크 후 해당 페이지 데이터 재조회
+    // 페이지 번호 변경 후 목록 재조회
     changePage(p) {
       if (p < 1 || p > this.totalPages) return
       this.pageNum = p
       this.fetchPosts()
     },
-    // 자료 상세 페이지로 이동 → ArchiveDetail.vue
+    // 질문 상세 페이지로 이동
     goDetail(id) {
-      this.$router.push(`/archive/${id}`)
+      this.$router.push(`/qna/${id}`)
     },
-    // 날짜 문자열에서 연-월-일(YYYY-MM-DD) 부분만 추출하여 반환
+    // 날짜 문자열에서 'YYYY-MM-DD' 형식만 추출
     formatDate(dateStr) {
       if (!dateStr) return '-'
       return dateStr.substring(0, 10)
@@ -138,17 +132,23 @@ export default {
 .board-table th, .board-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
 .board-table th { background: #f5f5f5; font-weight: bold; }
 .col-no { width: 60px; text-align: center; }
-.col-author { width: 110px; }
+.col-author { width: 100px; }
 .col-date { width: 100px; }
-.col-file { width: 180px; }
-.file-name-cell { font-size: 12px; color: #555; }
-.file-extra { font-size: 12px; color: #888; }
+.col-answer { width: 100px; text-align: center; }
 .col-views { width: 60px; text-align: center; }
 .post-row { cursor: pointer; }
 .post-row:hover { background: #f9f9f9; }
 .title-cell { color: #1a1a1a; font-weight: 500; }
-.comment-count { color: #1a73e8; font-size: 13px; margin-left: 4px; }
-.file-badge { font-size: 12px; color: #888; margin-left: 6px; }
+/* 답변완료 배지 (녹색): 답변이 1개 이상일 때 "답변 N" 형태로 표시 */
+.badge-answered {
+  background: #e8f5e9; color: #2e7d32;
+  border-radius: 12px; padding: 2px 10px; font-size: 12px; font-weight: bold;
+}
+/* 답변대기 배지 (주황색) */
+.badge-waiting {
+  background: #fff3e0; color: #e65100;
+  border-radius: 12px; padding: 2px 10px; font-size: 12px; font-weight: bold;
+}
 .empty { text-align: center; color: #999; padding: 40px; }
 .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 24px; }
 .page-btn { padding: 6px 14px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; }

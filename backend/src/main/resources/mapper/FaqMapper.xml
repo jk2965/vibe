@@ -3,9 +3,11 @@
 <mapper namespace="com.vibe.mapper.FaqMapper">
 
     <select id="findAll" resultType="com.vibe.model.FaqVO">
-        SELECT id, title, author_id, author_name, created_at, views
-        FROM vibe.faq
-        ORDER BY created_at DESC
+        SELECT f.id, f.title, f.author_id, f.author_name, f.created_at, f.views,
+               (SELECT COUNT(*) FROM vibe.archive_file af WHERE af.board_id = f.id) AS file_count,
+               (SELECT original_name FROM vibe.archive_file WHERE board_id = f.id AND ROWNUM = 1) AS first_file_name
+        FROM vibe.faq f
+        ORDER BY f.created_at DESC
     </select>
 
     <select id="findById" parameterType="String" resultType="com.vibe.model.FaqVO">

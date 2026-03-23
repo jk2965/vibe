@@ -72,6 +72,11 @@
         <span class="item-icon">❓</span>
         <span class="item-label">FAQ</span>
       </router-link>
+      <!-- Q&A 게시판: 질문 누구나, 답변 관리자/팀장만 -->
+      <router-link to="/qna" class="sidebar-item" :class="{ active: isActive('/qna') }">
+        <span class="item-icon">💬</span>
+        <span class="item-label">Q&A</span>
+      </router-link>
     </nav>
 
     <!-- 게시판 선택 팝업 모달 -->
@@ -172,6 +177,9 @@ export default {
       if (this.adminLevel >= 1) {
         boards.push({ label: 'FAQ', icon: '❓', path: '/faq/write' })
       }
+
+      // Q&A: 모든 사용자 질문 작성 가능
+      boards.push({ label: 'Q&A', icon: '💬', path: '/qna/write' })
 
       return boards
     }

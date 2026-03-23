@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibe.mapper.QnaAnswerMapper">
+
+    <!-- 특정 질문의 답변 목록 (작성일 오름차순) -->
+    <select id="findByQnaId" parameterType="String" resultType="com.vibe.model.QnaAnswerVO">
+        SELECT id, qna_id, content, author_id, author_name, created_at
+        FROM vibe.qna_answer
+        WHERE qna_id = #{qnaId}
+        ORDER BY created_at ASC
+    </select>
+
+    <!-- 답변 단건 조회 -->
+    <select id="findById" parameterType="String" resultType="com.vibe.model.QnaAnswerVO">
+        SELECT id, qna_id, content, author_id, author_name, created_at
+        FROM vibe.qna_answer
+        WHERE id = #{id}
+    </select>
+
+    <!-- 새 답변 등록 -->
+    <insert id="insert" parameterType="com.vibe.model.QnaAnswerVO">
+        INSERT INTO vibe.qna_answer (id, qna_id, content, author_id, author_name, created_at)
+        VALUES (#{id}, #{qnaId,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+                #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
+                #{createdAt,jdbcType=VARCHAR})
+    </insert>
+
+    <!-- 답변 내용 수정 -->
+    <update id="update" parameterType="com.vibe.model.QnaAnswerVO">
+        UPDATE vibe.qna_answer
+        SET content = #{content,jdbcType=VARCHAR}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 답변 단건 삭제 -->
+    <delete id="delete" parameterType="String">
+        DELETE FROM vibe.qna_answer WHERE id = #{id}
+    </delete>
+
+    <!-- 질문 삭제 시 해당 질문의 모든 답변 일괄 삭제 (cascade) -->
+    <delete id="deleteByQnaId" parameterType="String">
+        DELETE FROM vibe.qna_answer WHERE qna_id = #{qnaId}
+    </delete>
+
+</mapper>

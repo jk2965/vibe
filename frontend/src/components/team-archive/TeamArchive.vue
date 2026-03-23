@@ -39,7 +39,13 @@
               </td>
               <td class="col-author">{{ post.authorName }}</td>
               <td class="col-date">{{ formatDate(post.createdAt) }}</td>
-              <td class="col-file">{{ post.fileCount || 0 }}</td>
+              <td class="col-file">
+                <template v-if="post.fileCount > 0">
+                  <span class="file-name-cell">📎 {{ post.firstFileName }}</span>
+                  <span v-if="post.fileCount > 1" class="file-extra"> 외 {{ post.fileCount - 1 }}개</span>
+                </template>
+                <span v-else>-</span>
+              </td>
               <td class="col-views">{{ post.views }}</td>
             </tr>
           </tbody>
@@ -183,7 +189,9 @@ export default {
 .col-no { width: 60px; text-align: center; }
 .col-author { width: 110px; }
 .col-date { width: 100px; }
-.col-file { width: 50px; text-align: center; }
+.col-file { width: 180px; }
+.file-name-cell { font-size: 12px; color: #555; }
+.file-extra { font-size: 12px; color: #888; }
 .col-views { width: 60px; text-align: center; }
 .post-row { cursor: pointer; }
 .post-row:hover { background: #f9f9f9; }
