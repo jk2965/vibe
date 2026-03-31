@@ -1,79 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    전사 공지사항(Notice) MyBatis 매퍼.
+    단일 테이블 전략: 모든 게시판 데이터를 vibe.boards 테이블에서 관리.
+    board_type = 'NOTICE' 조건으로 전사 공지사항 데이터만 필터링.
+    목록 조회에는 board_type 조건 필수.
+    단건 조회 · 수정 · 삭제는 id(PK)가 고유하므로 board_type 조건 불필요.
+-->
 <mapper namespace="com.vibe.mapper.NoticeMapper">
 
+    <!-- 전사 공지사항 전체 목록: board_type = 'NOTICE' 필터, 필독 우선·최신순 정렬 -->
     <select id="findAll" resultType="com.vibe.model.NoticeVO">
         SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required, n.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
-        FROM vibe.notice n
+        FROM vibe.boards n
+        WHERE n.board_type = 'NOTICE'
         ORDER BY n.is_required DESC, n.created_at DESC
     </select>
 
+    <!-- 단건 조회: id는 PK이므로 board_type 조건 불필요 -->
     <select id="findById" parameterType="String" resultType="com.vibe.model.NoticeVO">
         SELECT id, title, content, author_id, author_name, created_at, views, is_required, tags
-        FROM vibe.notice
+        FROM vibe.boards
         WHERE id = #{id}
     </select>
 
+    <!-- 새 공지사항 등록: board_type = 'NOTICE' 고정값으로 삽입 -->
     <insert id="insert" parameterType="com.vibe.model.NoticeVO">
-        INSERT INTO vibe.notice (id, title, content, author_id, author_name, created_at, views, is_required, tags)
-        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+        INSERT INTO vibe.boards (id, board_type, title, content, author_id, author_name, created_at, views, is_required, tags)
+        VALUES (#{id}, 'NOTICE', #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
                 #{createdAt,jdbcType=VARCHAR}, 0, #{isRequired,jdbcType=INTEGER}, #{tags,jdbcType=VARCHAR})
     </insert>
 
+    <!-- 공지사항 수정: id(PK)로 특정 -->
     <update id="update" parameterType="com.vibe.model.NoticeVO">
-        UPDATE vibe.notice
+        UPDATE vibe.boards
         SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}, tags = #{tags,jdbcType=VARCHAR}
         WHERE id = #{id}
     </update>
 
+    <!-- 조회수 증가: id(PK)로 특정 -->
     <update id="incrementViews" parameterType="String">
-        UPDATE vibe.notice SET views = views + 1 WHERE id = #{id}
+        UPDATE vibe.boards SET views = views + 1 WHERE id = #{id}
     </update>
 
+    <!-- 공지사항 삭제: id(PK)로 특정 -->
     <delete id="delete" parameterType="String">
-        DELETE FROM vibe.notice WHERE id = #{id}
+        DELETE FROM vibe.boards WHERE id = #{id}
     </delete>
 
+    <!-- 필독 공지사항 목록: board_type = 'NOTICE' + is_required = 1 -->
     <select id="findRequired" resultType="com.vibe.model.NoticeVO">
         SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required, n.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
-        FROM vibe.notice n
-        WHERE n.is_required = 1
+        FROM vibe.boards n
+        WHERE n.board_type = 'NOTICE'
+          AND n.is_required = 1
         ORDER BY n.created_at DESC
     </select>
 
+    <!-- 필독 여부 설정: id(PK)로 특정 -->
     <update id="setRequired">
-        UPDATE vibe.notice SET is_required = #{isRequired} WHERE id = #{id}
+        UPDATE vibe.boards SET is_required = #{isRequired} WHERE id = #{id}
     </update>
 
+    <!-- 내 게시글 목록: board_type = 'NOTICE' + author_id 조건 -->
     <select id="findByAuthor" parameterType="String" resultType="com.vibe.model.NoticeVO">
         SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required, n.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
-        FROM vibe.notice n
-        WHERE n.author_id = #{authorId}
+        FROM vibe.boards n
+        WHERE n.board_type = 'NOTICE'
+          AND n.author_id = #{authorId}
         ORDER BY n.created_at DESC
     </select>
 
-    <!-- 제목 기준 검색: title 컬럼에 keyword 부분 일치 -->
+    <!-- 제목 검색: board_type = 'NOTICE' + title LIKE 조건 -->
     <select id="searchByTitle" parameterType="String" resultType="com.vibe.model.NoticeVO">
         SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required, n.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
-        FROM vibe.notice n
-        WHERE n.title LIKE '%' || #{keyword} || '%'
+        FROM vibe.boards n
+        WHERE n.board_type = 'NOTICE'
+          AND n.title LIKE '%' || #{keyword} || '%'
         ORDER BY n.created_at DESC
     </select>
 
-    <!-- 태그 기준 검색: tags 컬럼(쉼표 구분 문자열)에서 keyword와 정확히 일치하는 태그를 포함한 공지사항 검색 -->
+    <!-- 태그 검색: board_type = 'NOTICE' + 쉼표 구분 tags 컬럼에서 정확히 일치하는 태그 검색 -->
     <select id="searchByTag" parameterType="String" resultType="com.vibe.model.NoticeVO">
         SELECT n.id, n.title, n.author_id, n.author_name, n.created_at, n.views, n.is_required, n.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = n.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count
-        FROM vibe.notice n
-        WHERE n.tags = #{keyword}
-           OR n.tags LIKE #{keyword} || ',%'
-           OR n.tags LIKE '%,' || #{keyword}
-           OR n.tags LIKE '%,' || #{keyword} || ',%'
+        FROM vibe.boards n
+        WHERE n.board_type = 'NOTICE'
+          AND (   n.tags = #{keyword}
+               OR n.tags LIKE #{keyword} || ',%'
+               OR n.tags LIKE '%,' || #{keyword}
+               OR n.tags LIKE '%,' || #{keyword} || ',%')
         ORDER BY n.created_at DESC
     </select>
 

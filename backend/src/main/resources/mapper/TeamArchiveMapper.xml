@@ -1,86 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    팀 자료실(TeamArchive) MyBatis 매퍼.
+    단일 테이블 전략: 모든 게시판 데이터를 vibe.boards 테이블에서 관리.
+    board_type = 'TEAM_ARCHIVE' 조건으로 팀 자료실 데이터만 필터링.
+    팀별 조회(findByTeam)는 board_type + team 조건을 함께 사용.
+    파일 수(file_count)·첫 번째 파일명(first_file_name)은 vibe.archive_file 서브쿼리로 집계.
+    단건 조회 · 수정 · 삭제는 id(PK)가 고유하므로 board_type 조건 불필요.
+-->
 <mapper namespace="com.vibe.mapper.TeamArchiveMapper">
 
+    <!-- 특정 팀의 자료실 목록: board_type = 'TEAM_ARCHIVE' + team 조건, 파일 수/첫 파일명 서브쿼리 포함 -->
     <select id="findByTeam" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
         SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count,
                (SELECT original_name FROM vibe.archive_file WHERE board_id = a.id AND ROWNUM = 1) AS first_file_name
-        FROM vibe.team_archive a
-        WHERE a.team = #{team}
+        FROM vibe.boards a
+        WHERE a.board_type = 'TEAM_ARCHIVE'
+          AND a.team = #{team}
         ORDER BY a.is_required DESC, a.created_at DESC
     </select>
 
+    <!-- 단건 조회: id는 PK이므로 board_type 조건 불필요 -->
     <select id="findById" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
         SELECT id, title, content, author_id, author_name, created_at, views, team, is_required, tags
-        FROM vibe.team_archive
+        FROM vibe.boards
         WHERE id = #{id}
     </select>
 
+    <!-- 새 팀 자료실 게시글 등록: board_type = 'TEAM_ARCHIVE' 고정값으로 삽입 -->
     <insert id="insert" parameterType="com.vibe.model.TeamArchiveVO">
-        INSERT INTO vibe.team_archive (id, title, content, author_id, author_name, created_at, views, team, is_required, tags)
-        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+        INSERT INTO vibe.boards (id, board_type, title, content, author_id, author_name, created_at, views, team, is_required, tags)
+        VALUES (#{id}, 'TEAM_ARCHIVE', #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
                 #{createdAt,jdbcType=VARCHAR}, 0, #{team,jdbcType=VARCHAR}, 0, #{tags,jdbcType=VARCHAR})
     </insert>
 
+    <!-- 팀 자료실 게시글 수정: id(PK)로 특정 -->
     <update id="update" parameterType="com.vibe.model.TeamArchiveVO">
-        UPDATE vibe.team_archive
+        UPDATE vibe.boards
         SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}, tags = #{tags,jdbcType=VARCHAR}
         WHERE id = #{id}
     </update>
 
+    <!-- 조회수 증가: id(PK)로 특정 -->
     <update id="incrementViews" parameterType="String">
-        UPDATE vibe.team_archive SET views = views + 1 WHERE id = #{id}
+        UPDATE vibe.boards SET views = views + 1 WHERE id = #{id}
     </update>
 
+    <!-- 팀 자료실 게시글 삭제: id(PK)로 특정 -->
     <delete id="delete" parameterType="String">
-        DELETE FROM vibe.team_archive WHERE id = #{id}
+        DELETE FROM vibe.boards WHERE id = #{id}
     </delete>
 
+    <!-- 필독 팀 자료실 목록: board_type = 'TEAM_ARCHIVE' + is_required = 1 -->
     <select id="findRequired" resultType="com.vibe.model.TeamArchiveVO">
         SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
-        FROM vibe.team_archive a
-        WHERE a.is_required = 1
+        FROM vibe.boards a
+        WHERE a.board_type = 'TEAM_ARCHIVE'
+          AND a.is_required = 1
         ORDER BY a.created_at DESC
     </select>
 
+    <!-- 필독 여부 설정: id(PK)로 특정 -->
     <update id="setRequired">
-        UPDATE vibe.team_archive SET is_required = #{isRequired} WHERE id = #{id}
+        UPDATE vibe.boards SET is_required = #{isRequired} WHERE id = #{id}
     </update>
 
+    <!-- 내 게시글 목록: board_type = 'TEAM_ARCHIVE' + author_id 조건 -->
     <select id="findByAuthor" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
         SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
-        FROM vibe.team_archive a
-        WHERE a.author_id = #{authorId}
+        FROM vibe.boards a
+        WHERE a.board_type = 'TEAM_ARCHIVE'
+          AND a.author_id = #{authorId}
         ORDER BY a.created_at DESC
     </select>
 
-    <!-- 제목 기준 검색: title 컬럼에 keyword 부분 일치 -->
+    <!-- 제목 검색: board_type = 'TEAM_ARCHIVE' + title LIKE 조건 -->
     <select id="searchByTitle" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
         SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
-        FROM vibe.team_archive a
-        WHERE a.title LIKE '%' || #{keyword} || '%'
+        FROM vibe.boards a
+        WHERE a.board_type = 'TEAM_ARCHIVE'
+          AND a.title LIKE '%' || #{keyword} || '%'
         ORDER BY a.created_at DESC
     </select>
 
-    <!-- 태그 기준 검색: tags 컬럼(쉼표 구분 문자열)에서 keyword와 정확히 일치하는 태그를 포함한 팀 자료실 검색 -->
+    <!-- 태그 검색: board_type = 'TEAM_ARCHIVE' + 쉼표 구분 tags 컬럼에서 정확히 일치하는 태그 검색 -->
     <select id="searchByTag" parameterType="String" resultType="com.vibe.model.TeamArchiveVO">
         SELECT a.id, a.title, a.author_id, a.author_name, a.created_at, a.views, a.team, a.is_required, a.tags,
                (SELECT COUNT(*) FROM vibe.board_comment c WHERE c.board_id = a.id AND (c.is_deleted = 0 OR c.is_deleted IS NULL)) AS comment_count,
                (SELECT COUNT(*) FROM vibe.archive_file f WHERE f.board_id = a.id) AS file_count
-        FROM vibe.team_archive a
-        WHERE a.tags = #{keyword}
-           OR a.tags LIKE #{keyword} || ',%'
-           OR a.tags LIKE '%,' || #{keyword}
-           OR a.tags LIKE '%,' || #{keyword} || ',%'
+        FROM vibe.boards a
+        WHERE a.board_type = 'TEAM_ARCHIVE'
+          AND (   a.tags = #{keyword}
+               OR a.tags LIKE #{keyword} || ',%'
+               OR a.tags LIKE '%,' || #{keyword}
+               OR a.tags LIKE '%,' || #{keyword} || ',%')
         ORDER BY a.created_at DESC
     </select>
 

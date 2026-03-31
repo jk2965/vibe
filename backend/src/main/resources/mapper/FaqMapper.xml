@@ -1,40 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    FAQ 게시판 MyBatis 매퍼.
+    단일 테이블 전략: 모든 게시판 데이터를 vibe.boards 테이블에서 관리.
+    board_type = 'FAQ' 조건으로 FAQ 데이터만 필터링.
+    FAQ는 is_required·tags·team 컬럼을 사용하지 않으므로 SELECT/INSERT에서 제외.
+    단건 조회 · 수정 · 삭제는 id(PK)가 고유하므로 board_type 조건 불필요.
+-->
 <mapper namespace="com.vibe.mapper.FaqMapper">
 
+    <!-- FAQ 전체 목록: board_type = 'FAQ' 필터, 파일 수/첫 파일명 서브쿼리 포함 -->
     <select id="findAll" resultType="com.vibe.model.FaqVO">
         SELECT f.id, f.title, f.author_id, f.author_name, f.created_at, f.views,
                (SELECT COUNT(*) FROM vibe.archive_file af WHERE af.board_id = f.id) AS file_count,
                (SELECT original_name FROM vibe.archive_file WHERE board_id = f.id AND ROWNUM = 1) AS first_file_name
-        FROM vibe.faq f
+        FROM vibe.boards f
+        WHERE f.board_type = 'FAQ'
         ORDER BY f.created_at DESC
     </select>
 
+    <!-- 단건 조회: id는 PK이므로 board_type 조건 불필요 -->
     <select id="findById" parameterType="String" resultType="com.vibe.model.FaqVO">
         SELECT id, title, content, author_id, author_name, created_at, views
-        FROM vibe.faq
+        FROM vibe.boards
         WHERE id = #{id}
     </select>
 
+    <!-- 새 FAQ 등록: board_type = 'FAQ' 고정값으로 삽입, is_required·tags·team 미사용 -->
     <insert id="insert" parameterType="com.vibe.model.FaqVO">
-        INSERT INTO vibe.faq (id, title, content, author_id, author_name, created_at, views)
-        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+        INSERT INTO vibe.boards (id, board_type, title, content, author_id, author_name, created_at, views)
+        VALUES (#{id}, 'FAQ', #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
                 #{createdAt,jdbcType=VARCHAR}, 0)
     </insert>
 
+    <!-- FAQ 수정: id(PK)로 특정, tags 컬럼 없으므로 title/content만 수정 -->
     <update id="update" parameterType="com.vibe.model.FaqVO">
-        UPDATE vibe.faq
+        UPDATE vibe.boards
         SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}
         WHERE id = #{id}
     </update>
 
+    <!-- 조회수 증가: id(PK)로 특정 -->
     <update id="incrementViews" parameterType="String">
-        UPDATE vibe.faq SET views = views + 1 WHERE id = #{id}
+        UPDATE vibe.boards SET views = views + 1 WHERE id = #{id}
     </update>
 
+    <!-- FAQ 삭제: id(PK)로 특정 -->
     <delete id="delete" parameterType="String">
-        DELETE FROM vibe.faq WHERE id = #{id}
+        DELETE FROM vibe.boards WHERE id = #{id}
     </delete>
 
 </mapper>

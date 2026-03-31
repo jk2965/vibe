@@ -1,53 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    Q&A 게시판 MyBatis 매퍼.
+    단일 테이블 전략: 모든 게시판 데이터를 vibe.boards 테이블에서 관리.
+    board_type = 'QNA' 조건으로 Q&A 데이터만 필터링.
+    Q&A는 is_required·tags·team 컬럼을 사용하지 않으므로 SELECT/INSERT에서 제외.
+    답변 수(answer_count)는 vibe.qna_answer 서브쿼리로 집계.
+    단건 조회 · 수정 · 삭제는 id(PK)가 고유하므로 board_type 조건 불필요.
+-->
 <mapper namespace="com.vibe.mapper.QnaMapper">
 
-    <!-- 전체 질문 목록: 답변 수를 서브쿼리로 집계, 최신순 정렬 -->
+    <!-- Q&A 전체 질문 목록: board_type = 'QNA' 필터, 답변 수 서브쿼리 포함, 최신순 정렬 -->
     <select id="findAll" resultType="com.vibe.model.QnaVO">
         SELECT q.id, q.title, q.author_id, q.author_name, q.created_at, q.views,
                (SELECT COUNT(*) FROM vibe.qna_answer a WHERE a.qna_id = q.id) AS answer_count
-        FROM vibe.qna q
+        FROM vibe.boards q
+        WHERE q.board_type = 'QNA'
         ORDER BY q.created_at DESC
     </select>
 
-    <!-- 질문 단건 조회 (본문 포함) -->
+    <!-- 단건 조회: id는 PK이므로 board_type 조건 불필요 -->
     <select id="findById" parameterType="String" resultType="com.vibe.model.QnaVO">
         SELECT id, title, content, author_id, author_name, created_at, views
-        FROM vibe.qna
+        FROM vibe.boards
         WHERE id = #{id}
     </select>
 
-    <!-- 새 질문 등록 -->
+    <!-- 새 질문 등록: board_type = 'QNA' 고정값으로 삽입, is_required·tags·team 미사용 -->
     <insert id="insert" parameterType="com.vibe.model.QnaVO">
-        INSERT INTO vibe.qna (id, title, content, author_id, author_name, created_at, views)
-        VALUES (#{id}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+        INSERT INTO vibe.boards (id, board_type, title, content, author_id, author_name, created_at, views)
+        VALUES (#{id}, 'QNA', #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
                 #{authorId,jdbcType=VARCHAR}, #{authorName,jdbcType=VARCHAR},
                 #{createdAt,jdbcType=VARCHAR}, 0)
     </insert>
 
-    <!-- 질문 수정 (제목/내용만) -->
+    <!-- 질문 수정: id(PK)로 특정, title/content만 수정 -->
     <update id="update" parameterType="com.vibe.model.QnaVO">
-        UPDATE vibe.qna
+        UPDATE vibe.boards
         SET title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}
         WHERE id = #{id}
     </update>
 
-    <!-- 조회수 1 증가 -->
+    <!-- 조회수 증가: id(PK)로 특정 -->
     <update id="incrementViews" parameterType="String">
-        UPDATE vibe.qna SET views = views + 1 WHERE id = #{id}
+        UPDATE vibe.boards SET views = views + 1 WHERE id = #{id}
     </update>
 
-    <!-- 질문 삭제 -->
+    <!-- 질문 삭제: id(PK)로 특정 -->
     <delete id="delete" parameterType="String">
-        DELETE FROM vibe.qna WHERE id = #{id}
+        DELETE FROM vibe.boards WHERE id = #{id}
     </delete>
 
-    <!-- 특정 작성자의 질문 목록 (내 게시글 페이지용) -->
+    <!-- 내 질문 목록: board_type = 'QNA' + author_id 조건 -->
     <select id="findByAuthor" parameterType="String" resultType="com.vibe.model.QnaVO">
         SELECT q.id, q.title, q.author_id, q.author_name, q.created_at, q.views,
                (SELECT COUNT(*) FROM vibe.qna_answer a WHERE a.qna_id = q.id) AS answer_count
-        FROM vibe.qna q
-        WHERE q.author_id = #{authorId}
+        FROM vibe.boards q
+        WHERE q.board_type = 'QNA'
+          AND q.author_id = #{authorId}
         ORDER BY q.created_at DESC
     </select>
 
