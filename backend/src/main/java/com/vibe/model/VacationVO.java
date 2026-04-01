@@ -10,9 +10,9 @@ import lombok.Setter;
  * userId는 UserVO.java의 id 필드와 연결됨.
  * 휴가 승인/차감은 UserVO.java의 remainingVacation 필드와 연동됨.
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter            // 모든 필드 getter 자동 생성
+@Setter            // 모든 필드 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class VacationVO {
 
     /** 휴가 신청 고유 식별자 */

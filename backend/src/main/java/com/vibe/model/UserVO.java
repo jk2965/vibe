@@ -9,9 +9,9 @@ import lombok.Setter;
  * UserMapper.java, UserService.java에서 사용되며,
  * VacationVO.java, AttendanceRecordVO.java, ScheduleVO.java 등에서 userId/username으로 참조됨.
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter            // 모든 필드 getter 자동 생성
+@Setter            // 모든 필드 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class UserVO {
 
     /** 사용자 고유 식별자 (로그인 ID) */

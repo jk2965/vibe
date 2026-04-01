@@ -11,9 +11,9 @@ import lombok.Setter;
  * team 필드로 팀 공유 일정과 개인 일정을 구분하며,
  * UserVO.java의 team 필드로 팀 필터링이 적용됨.
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter            // 모든 필드 getter 자동 생성
+@Setter            // 모든 필드 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class ScheduleVO {
 
     /** 일정 고유 식별자 */

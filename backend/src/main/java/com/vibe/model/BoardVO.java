@@ -16,10 +16,10 @@ import java.util.List;
  *
  * [Builder Pattern] BoardVO.builder().title("...").authorId("...").build()
  */
-@SuperBuilder
-@Getter
-@Setter
-@NoArgsConstructor
+@SuperBuilder          // 빌더 패턴 자동 생성 — AbstractBoardVO 필드 포함 체이닝 가능
+@Getter                // 모든 필드 getter 자동 생성
+@Setter                // 모든 필드 setter 자동 생성
+@NoArgsConstructor     // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class BoardVO extends AbstractBoardVO {
 
     /** 댓글 수 (CommentVO.java 개수 집계) */

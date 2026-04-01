@@ -10,9 +10,9 @@ import lombok.Setter;
  * AttendanceRecordService.java에서 조건 생성 후 전달됨.
  * 조회 결과는 AttendanceRecordVO.java 리스트로 반환됨.
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter            // 모든 필드 getter 자동 생성
+@Setter            // 모든 필드 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class AttendanceRecordSearchParamVO {
 
     /** 검색 대상 직원 이름 (UserVO.java의 username 참조, null이면 전체 조회) */

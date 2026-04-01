@@ -17,10 +17,10 @@ import lombok.experimental.SuperBuilder;
  * [Builder Pattern] Lombok @SuperBuilder로 상속 가능한 빌더 자동 생성.
  * MyBatis ResultMap 호환을 위해 @NoArgsConstructor 유지.
  */
-@SuperBuilder
-@Getter
-@Setter
-@NoArgsConstructor
+@SuperBuilder          // 빌더 패턴 자동 생성 — 상속 가능한 Builder 제공 (서브클래스에서 .builder() 사용 가능)
+@Getter                // 모든 필드 getter 자동 생성
+@Setter                // 모든 필드 setter 자동 생성
+@NoArgsConstructor     // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public abstract class AbstractBoardVO implements BoardEntity {
 
     /** 게시글 고유 식별자 (UUID) */

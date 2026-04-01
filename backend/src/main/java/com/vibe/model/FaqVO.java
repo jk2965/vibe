@@ -16,10 +16,10 @@ import java.util.List;
  *
  * [Builder Pattern] FaqVO.builder().title("질문").content("답변").build()
  */
-@SuperBuilder
-@Getter
-@Setter
-@NoArgsConstructor
+@SuperBuilder          // 빌더 패턴 자동 생성 — AbstractBoardVO 필드 포함 체이닝 가능
+@Getter                // 모든 필드 getter 자동 생성
+@Setter                // 모든 필드 setter 자동 생성
+@NoArgsConstructor     // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class FaqVO extends AbstractBoardVO {
 
     /** 첨부 파일 수 (목록 조회 시 서브쿼리로 집계) */

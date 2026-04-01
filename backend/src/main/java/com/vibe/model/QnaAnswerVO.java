@@ -9,9 +9,9 @@ import lombok.Setter;
  * QnaAnswerMapper.java, QnaService.java에서 사용됨.
  * qnaId 필드로 QnaVO.java의 질문과 연결됨.
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter            // 모든 필드 getter 자동 생성
+@Setter            // 모든 필드 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class QnaAnswerVO {
 
     /** 답변 고유 식별자 (UUID) */

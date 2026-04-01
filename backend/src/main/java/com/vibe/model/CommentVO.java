@@ -10,9 +10,9 @@ import lombok.Setter;
  * BoardVO.java의 boardId를 통해 게시글과 연결됨.
  * parentId를 통해 대댓글(계층형 구조) 지원.
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter            // 모든 필드 getter 자동 생성
+@Setter            // 모든 필드 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class CommentVO {
 
     /** 댓글 고유 식별자 */

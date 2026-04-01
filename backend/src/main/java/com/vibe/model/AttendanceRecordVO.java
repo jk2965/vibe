@@ -10,9 +10,9 @@ import lombok.Setter;
  * username은 UserVO.java의 username 필드와 연결됨.
  * 검색 조건은 AttendanceRecordSearchParamVO.java 참조.
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter            // 모든 필드 getter 자동 생성
+@Setter            // 모든 필드 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class AttendanceRecordVO {
 
     /** 출퇴근 기록 고유 식별자 */

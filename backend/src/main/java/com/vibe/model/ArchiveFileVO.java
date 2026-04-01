@@ -11,9 +11,9 @@ import lombok.Setter;
  * List<ArchiveFileVO> 형태로 참조됨.
  * boardId는 각 게시판 유형의 게시글 ID를 공통으로 가리킴.
  */
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter            // 모든 필드 getter 자동 생성
+@Setter            // 모든 필드 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 자동 생성 — MyBatis ResultMap 매핑에 필수
 public class ArchiveFileVO {
 
     /** 파일 고유 식별자 */
