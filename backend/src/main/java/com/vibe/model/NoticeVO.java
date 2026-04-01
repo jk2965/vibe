@@ -1,5 +1,10 @@
 package com.vibe.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import java.util.List;
 
 /**
@@ -12,6 +17,10 @@ import java.util.List;
  *
  * [Builder Pattern] NoticeVO.builder().title("...").isRequired(1).build()
  */
+@SuperBuilder
+@Getter
+@Setter
+@NoArgsConstructor
 public class NoticeVO extends AbstractBoardVO {
 
     /** 댓글 수 (CommentVO.java 개수 집계) */
@@ -22,47 +31,4 @@ public class NoticeVO extends AbstractBoardVO {
     private String tags;
     /** 첨부 파일 목록 (ArchiveFileVO.java 참조, ArchiveFileMapper.java에서 조회) */
     private List<ArchiveFileVO> files;
-
-    /** commentCount 필드 반환 */
-    public Integer getCommentCount() { return commentCount; }
-    /** commentCount 필드 설정 */
-    public void setCommentCount(Integer commentCount) { this.commentCount = commentCount; }
-    /** isRequired 필드 반환 */
-    public Integer getIsRequired() { return isRequired; }
-    /** isRequired 필드 설정 */
-    public void setIsRequired(Integer isRequired) { this.isRequired = isRequired; }
-    /** tags 필드 반환 */
-    public String getTags() { return tags; }
-    /** tags 필드 설정 */
-    public void setTags(String tags) { this.tags = tags; }
-    /** files 필드 반환 */
-    public List<ArchiveFileVO> getFiles() { return files; }
-    /** files 필드 설정 */
-    public void setFiles(List<ArchiveFileVO> files) { this.files = files; }
-
-    /** Builder 인스턴스 반환 */
-    public static Builder builder() { return new Builder(); }
-
-    public static class Builder extends AbstractBoardVO.Builder<NoticeVO, Builder> {
-        private Integer commentCount;
-        private Integer isRequired;
-        private String tags;
-        private List<ArchiveFileVO> files;
-
-        public Builder commentCount(Integer commentCount) { this.commentCount = commentCount; return this; }
-        public Builder isRequired(Integer isRequired)     { this.isRequired = isRequired;     return this; }
-        public Builder tags(String tags)                  { this.tags = tags;                 return this; }
-        public Builder files(List<ArchiveFileVO> files)   { this.files = files;               return this; }
-
-        @Override
-        public NoticeVO build() {
-            NoticeVO vo = new NoticeVO();
-            applyTo(vo);
-            vo.setCommentCount(commentCount);
-            vo.setIsRequired(isRequired);
-            vo.setTags(tags);
-            vo.setFiles(files);
-            return vo;
-        }
-    }
 }

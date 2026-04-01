@@ -1,5 +1,10 @@
 package com.vibe.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import java.util.List;
 
 /**
@@ -10,39 +15,14 @@ import java.util.List;
  *
  * [Builder Pattern] QnaVO.builder().title("질문").authorId("user1").build()
  */
+@SuperBuilder
+@Getter
+@Setter
+@NoArgsConstructor
 public class QnaVO extends AbstractBoardVO {
 
     /** 답변 수 (SELECT COUNT 서브쿼리로 집계) */
     private Integer answerCount;
     /** 답변 목록 (상세 조회 시 QnaAnswerVO 리스트로 채워짐) */
     private List<QnaAnswerVO> answers;
-
-    /** answerCount 필드 반환 */
-    public Integer getAnswerCount() { return answerCount; }
-    /** answerCount 필드 설정 */
-    public void setAnswerCount(Integer answerCount) { this.answerCount = answerCount; }
-    /** answers 필드 반환 */
-    public List<QnaAnswerVO> getAnswers() { return answers; }
-    /** answers 필드 설정 */
-    public void setAnswers(List<QnaAnswerVO> answers) { this.answers = answers; }
-
-    /** Builder 인스턴스 반환 */
-    public static Builder builder() { return new Builder(); }
-
-    public static class Builder extends AbstractBoardVO.Builder<QnaVO, Builder> {
-        private Integer answerCount;
-        private List<QnaAnswerVO> answers;
-
-        public Builder answerCount(Integer answerCount) { this.answerCount = answerCount; return this; }
-        public Builder answers(List<QnaAnswerVO> answers) { this.answers = answers;       return this; }
-
-        @Override
-        public QnaVO build() {
-            QnaVO vo = new QnaVO();
-            applyTo(vo);
-            vo.setAnswerCount(answerCount);
-            vo.setAnswers(answers);
-            return vo;
-        }
-    }
 }

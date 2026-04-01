@@ -1,11 +1,18 @@
 package com.vibe.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * 게시글 댓글(및 대댓글) 정보를 담는 Value Object 클래스.
  * CommentMapper.java, CommentService.java에서 사용되며,
  * BoardVO.java의 boardId를 통해 게시글과 연결됨.
  * parentId를 통해 대댓글(계층형 구조) 지원.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class CommentVO {
 
     /** 댓글 고유 식별자 */
@@ -24,37 +31,4 @@ public class CommentVO {
     private String parentId;
     /** 삭제 여부 (1: 삭제됨, 0: 정상, 소프트 딜리트 방식) */
     private Integer isDeleted;
-
-    /** id 필드 반환 */
-    public String getId() { return id; }
-    /** id 필드 설정 */
-    public void setId(String id) { this.id = id; }
-    /** boardId 필드 반환 */
-    public String getBoardId() { return boardId; }
-    /** boardId 필드 설정 */
-    public void setBoardId(String boardId) { this.boardId = boardId; }
-    /** authorId 필드 반환 */
-    public String getAuthorId() { return authorId; }
-    /** authorId 필드 설정 */
-    public void setAuthorId(String authorId) { this.authorId = authorId; }
-    /** authorName 필드 반환 */
-    public String getAuthorName() { return authorName; }
-    /** authorName 필드 설정 */
-    public void setAuthorName(String authorName) { this.authorName = authorName; }
-    /** content 필드 반환 */
-    public String getContent() { return content; }
-    /** content 필드 설정 */
-    public void setContent(String content) { this.content = content; }
-    /** createdAt 필드 반환 */
-    public String getCreatedAt() { return createdAt; }
-    /** createdAt 필드 설정 */
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
-    /** parentId 필드 반환 */
-    public String getParentId() { return parentId; }
-    /** parentId 필드 설정 */
-    public void setParentId(String parentId) { this.parentId = parentId; }
-    /** isDeleted 필드 반환 */
-    public Integer getIsDeleted() { return isDeleted; }
-    /** isDeleted 필드 설정 */
-    public void setIsDeleted(Integer isDeleted) { this.isDeleted = isDeleted; }
 }

@@ -1,12 +1,20 @@
 package com.vibe.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * 직원 휴가 신청 정보를 담는 Value Object 클래스.
  * VacationMapper.java, VacationService.java에서 사용되며,
  * userId는 UserVO.java의 id 필드와 연결됨.
  * 휴가 승인/차감은 UserVO.java의 remainingVacation 필드와 연동됨.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class VacationVO {
+
     /** 휴가 신청 고유 식별자 */
     private String id;
     /** 휴가 신청 직원의 사용자 ID (UserVO.java의 id 참조) */
@@ -21,33 +29,4 @@ public class VacationVO {
     private String reason;
     /** 휴가 신청 일시 (문자열 형식) */
     private String createdAt;
-
-    /** id 필드 반환 */
-    public String getId() { return id; }
-    /** id 필드 설정 */
-    public void setId(String id) { this.id = id; }
-    /** userId 필드 반환 */
-    public String getUserId() { return userId; }
-    /** userId 필드 설정 */
-    public void setUserId(String userId) { this.userId = userId; }
-    /** startDate 필드 반환 */
-    public String getStartDate() { return startDate; }
-    /** startDate 필드 설정 */
-    public void setStartDate(String startDate) { this.startDate = startDate; }
-    /** endDate 필드 반환 */
-    public String getEndDate() { return endDate; }
-    /** endDate 필드 설정 */
-    public void setEndDate(String endDate) { this.endDate = endDate; }
-    /** type 필드 반환 */
-    public String getType() { return type; }
-    /** type 필드 설정 */
-    public void setType(String type) { this.type = type; }
-    /** reason 필드 반환 */
-    public String getReason() { return reason; }
-    /** reason 필드 설정 */
-    public void setReason(String reason) { this.reason = reason; }
-    /** createdAt 필드 반환 */
-    public String getCreatedAt() { return createdAt; }
-    /** createdAt 필드 설정 */
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 }

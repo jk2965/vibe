@@ -1,5 +1,10 @@
 package com.vibe.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import java.util.List;
 
 /**
@@ -11,6 +16,10 @@ import java.util.List;
  *
  * [Builder Pattern] FaqVO.builder().title("질문").content("답변").build()
  */
+@SuperBuilder
+@Getter
+@Setter
+@NoArgsConstructor
 public class FaqVO extends AbstractBoardVO {
 
     /** 첨부 파일 수 (목록 조회 시 서브쿼리로 집계) */
@@ -19,40 +28,4 @@ public class FaqVO extends AbstractBoardVO {
     private String firstFileName;
     /** 첨부 파일 목록 (FaqService.getDetail() 조회 시 채워짐, archive_file 테이블 공유) */
     private List<ArchiveFileVO> files;
-
-    /** fileCount 필드 반환 */
-    public Integer getFileCount() { return fileCount; }
-    /** fileCount 필드 설정 */
-    public void setFileCount(Integer fileCount) { this.fileCount = fileCount; }
-    /** firstFileName 필드 반환 */
-    public String getFirstFileName() { return firstFileName; }
-    /** firstFileName 필드 설정 */
-    public void setFirstFileName(String firstFileName) { this.firstFileName = firstFileName; }
-    /** files 필드 반환 (상세 조회 시 첨부파일 목록) */
-    public List<ArchiveFileVO> getFiles() { return files; }
-    /** files 필드 설정 */
-    public void setFiles(List<ArchiveFileVO> files) { this.files = files; }
-
-    /** Builder 인스턴스 반환 */
-    public static Builder builder() { return new Builder(); }
-
-    public static class Builder extends AbstractBoardVO.Builder<FaqVO, Builder> {
-        private Integer fileCount;
-        private String firstFileName;
-        private List<ArchiveFileVO> files;
-
-        public Builder fileCount(Integer fileCount)        { this.fileCount = fileCount;       return this; }
-        public Builder firstFileName(String firstFileName) { this.firstFileName = firstFileName; return this; }
-        public Builder files(List<ArchiveFileVO> files)    { this.files = files;               return this; }
-
-        @Override
-        public FaqVO build() {
-            FaqVO vo = new FaqVO();
-            applyTo(vo);
-            vo.setFileCount(fileCount);
-            vo.setFirstFileName(firstFileName);
-            vo.setFiles(files);
-            return vo;
-        }
-    }
 }

@@ -1,5 +1,10 @@
 package com.vibe.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import java.util.List;
 
 /**
@@ -11,6 +16,10 @@ import java.util.List;
  *
  * [Builder Pattern] ArchiveVO.builder().title("...").tags("Spring,Java").build()
  */
+@SuperBuilder
+@Getter
+@Setter
+@NoArgsConstructor
 public class ArchiveVO extends AbstractBoardVO {
 
     /** 댓글 수 (CommentVO.java 개수 집계) */
@@ -25,61 +34,4 @@ public class ArchiveVO extends AbstractBoardVO {
     private String firstFileName;
     /** 첨부 파일 목록 (ArchiveFileVO.java 참조, ArchiveFileMapper.java에서 조회) */
     private List<ArchiveFileVO> files;
-
-    /** commentCount 필드 반환 */
-    public Integer getCommentCount() { return commentCount; }
-    /** commentCount 필드 설정 */
-    public void setCommentCount(Integer commentCount) { this.commentCount = commentCount; }
-    /** isRequired 필드 반환 */
-    public Integer getIsRequired() { return isRequired; }
-    /** isRequired 필드 설정 */
-    public void setIsRequired(Integer isRequired) { this.isRequired = isRequired; }
-    /** tags 필드 반환 */
-    public String getTags() { return tags; }
-    /** tags 필드 설정 */
-    public void setTags(String tags) { this.tags = tags; }
-    /** fileCount 필드 반환 */
-    public Integer getFileCount() { return fileCount; }
-    /** fileCount 필드 설정 */
-    public void setFileCount(Integer fileCount) { this.fileCount = fileCount; }
-    /** firstFileName 필드 반환 */
-    public String getFirstFileName() { return firstFileName; }
-    /** firstFileName 필드 설정 */
-    public void setFirstFileName(String firstFileName) { this.firstFileName = firstFileName; }
-    /** files 필드 반환 */
-    public List<ArchiveFileVO> getFiles() { return files; }
-    /** files 필드 설정 */
-    public void setFiles(List<ArchiveFileVO> files) { this.files = files; }
-
-    /** Builder 인스턴스 반환 */
-    public static Builder builder() { return new Builder(); }
-
-    public static class Builder extends AbstractBoardVO.Builder<ArchiveVO, Builder> {
-        private Integer commentCount;
-        private Integer isRequired;
-        private String tags;
-        private Integer fileCount;
-        private String firstFileName;
-        private List<ArchiveFileVO> files;
-
-        public Builder commentCount(Integer commentCount)   { this.commentCount = commentCount; return this; }
-        public Builder isRequired(Integer isRequired)       { this.isRequired = isRequired;     return this; }
-        public Builder tags(String tags)                    { this.tags = tags;                 return this; }
-        public Builder fileCount(Integer fileCount)         { this.fileCount = fileCount;       return this; }
-        public Builder firstFileName(String firstFileName)  { this.firstFileName = firstFileName; return this; }
-        public Builder files(List<ArchiveFileVO> files)     { this.files = files;               return this; }
-
-        @Override
-        public ArchiveVO build() {
-            ArchiveVO vo = new ArchiveVO();
-            applyTo(vo);
-            vo.setCommentCount(commentCount);
-            vo.setIsRequired(isRequired);
-            vo.setTags(tags);
-            vo.setFileCount(fileCount);
-            vo.setFirstFileName(firstFileName);
-            vo.setFiles(files);
-            return vo;
-        }
-    }
 }

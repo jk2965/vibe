@@ -1,10 +1,17 @@
 package com.vibe.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * 사용자(직원) 정보를 담는 Value Object 클래스.
  * UserMapper.java, UserService.java에서 사용되며,
  * VacationVO.java, AttendanceRecordVO.java, ScheduleVO.java 등에서 userId/username으로 참조됨.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserVO {
 
     /** 사용자 고유 식별자 (로그인 ID) */
@@ -23,37 +30,4 @@ public class UserVO {
     private String team;
     /** 팀장 여부 (1: 팀장, 0: 일반 팀원) */
     private Integer isTeamLeader;
-
-    /** id 필드 반환 */
-    public String getId() { return id; }
-    /** id 필드 설정 */
-    public void setId(String id) { this.id = id; }
-    /** username 필드 반환 */
-    public String getUsername() { return username; }
-    /** username 필드 설정 */
-    public void setUsername(String username) { this.username = username; }
-    /** password 필드 반환 */
-    public String getPassword() { return password; }
-    /** password 필드 설정 */
-    public void setPassword(String password) { this.password = password; }
-    /** position 필드 반환 */
-    public String getPosition() { return position; }
-    /** position 필드 설정 */
-    public void setPosition(String position) { this.position = position; }
-    /** remainingVacation 필드 반환 */
-    public Double getRemainingVacation() { return remainingVacation; }
-    /** remainingVacation 필드 설정 */
-    public void setRemainingVacation(Double remainingVacation) { this.remainingVacation = remainingVacation; }
-    /** isAdmin 필드 반환 */
-    public Integer getIsAdmin() { return isAdmin; }
-    /** isAdmin 필드 설정 */
-    public void setIsAdmin(Integer isAdmin) { this.isAdmin = isAdmin; }
-    /** team 필드 반환 */
-    public String getTeam() { return team; }
-    /** team 필드 설정 */
-    public void setTeam(String team) { this.team = team; }
-    /** isTeamLeader 필드 반환 */
-    public Integer getIsTeamLeader() { return isTeamLeader; }
-    /** isTeamLeader 필드 설정 */
-    public void setIsTeamLeader(Integer isTeamLeader) { this.isTeamLeader = isTeamLeader; }
 }
