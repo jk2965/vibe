@@ -30,7 +30,7 @@ export default {
   computed: {
     // 현재 경로가 게시판 관련인지 확인하여 사이드바 표시 여부 결정
     showSidebar() {
-      const boardPaths = ['/board', '/notice', '/team-notice', '/archive', '/team-archive', '/faq', '/board-hub', '/required', '/my-posts', '/search']
+      const boardPaths = ['/board', '/notice', '/team-notice', '/archive', '/team-archive', '/faq', '/board-hub', '/required', '/my-posts', '/search', '/qna']
       return boardPaths.some(p => this.$route.path.startsWith(p))
     }
   }

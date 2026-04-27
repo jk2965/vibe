@@ -124,3 +124,10 @@ Spring Boot 3 + MyBatis + Vue.js 3 기반의 사내 인트라넷 시스템.
 - 나머지 8개 VO (`QnaAnswerVO`, `ArchiveFileVO`, `CommentVO`, `UserVO`, `VacationVO`, `ScheduleVO`, `AttendanceRecordVO`, `AttendanceRecordSearchParamVO`): `@Getter` `@Setter` `@NoArgsConstructor` 적용, 수동 getter/setter 제거
 - 보일러플레이트 코드 약 450줄 제거
 - Lombok 어노테이션 설명 주석 추가
+
+---
+
+### v1.15.0 — Oracle DB 재구성 및 Q&A 사이드바 추가 `2026-04-27`
+- Oracle `MAX_STRING_SIZE=EXTENDED` 마이그레이션 스크립트 추가 (`sql/extended_setup.sql`, `sql/migrate.sh`)
+- `sql/init.sql` 재작성: 현재 Mapper 구조 기반 전체 테이블 스키마 정비, `VARCHAR2(32767)` 적용
+- Q&A 게시판 경로(`/qna`)를 사이드바 표시 경로 목록에 추가
